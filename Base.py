@@ -57,7 +57,9 @@ def createAccount():
                 newID = int(prevID[0])+1
                 
             conn.execute(text("insert into teacher(Tid, first_name, last_name, password) values(:Tid, :first_name, :last_name, :password)"), {"Tid": newID, "first_name":request.form["first_name"], "last_name":request.form["last_name"],"password":request.form["password"]})
+            
             conn.commit()
+            
             result = conn.execute(text('select * from teacher')).fetchall()
             
             for row in result:
