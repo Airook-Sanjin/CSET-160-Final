@@ -1,0 +1,22 @@
+{% extends '/Base.html'%}
+{% block body%}
+
+    <div class="body"><h1>Register Page<h1>
+        {% if error %}
+        <h2>{{error}}</h2>
+        
+        {% else %}
+        <h2>{{success}}</h2>
+        {% endif %}
+        <form class ="formContainer"action="/Register" method="POST">
+            <input type="text" name="first_name" placeholder="First name" class="input_field"> <br>
+            <input type="text" name="last_name" placeholder="Last name" class="input_field"> <br>
+            <input type="text" name="password" placeholder="Password" class="input_field"> <br>
+            <div class="RadioInput">
+            <input type="radio" name="Teach-Stud" placeholder="Student" class="input_field"value="1" >Student</input> <br>
+            <input type="radio" name="Teach-Stud" placeholder="Teacher" class="input_field" value="0">Teacher</input> <br>
+            </div>
+            <input type="submit" value="Create" class="input_submit">
+        </form>
+    </div>
+{% endblock %}
