@@ -63,11 +63,56 @@ def createAccount():
         print(f"Error: {e}") 
         return render_template("Register.html", error = "Failed", success = None)
 
-@app.route("/Account")
+@app.route("/Account", methods = ['GET'] )
 def seeAccounts():
     StudentTBL = conn.execute(text('select * from student')).fetchall()
     TeacherTBL = conn.execute(text('select * from teacher')).fetchall()
     return render_template("Accounts.html",StudentTBL = StudentTBL,TeacherTBL = TeacherTBL )
+
+@app.route("/Account", methods = ['POST'] )
+def SearchAccounts():
+    SpecificStudent = None # Set to None for it to work properly on HTML
+    TeacherTBL = None # Set to None for it to work properly on HTML
+    try:
+        
+        RadioValue = request.form.get("Teach-Stud")
+        print(f"Radio: {RadioValue}")
+        
+        
+        if RadioValue == "1":  # check if any radio button is clicked. If Student selected, it will show only student Table
+            SpecificStudent = conn.execute(text("Select * from student Where first_name = :first_name or last_name = :first_name or Concat(first_name,' ',last_name) = :first_name"),request.form ).fetchall() # searches for specific student 
+            print(SpecificStudent)
+        
+        else: # check if any radio button is clicked. Else, it will show only student Table
+            TeacherTBL = conn.execute(text("Select * from teacher Where first_name = :first_name or last_name = :first_name or Concat(first_name,' ',last_name) = :first_name"),request.form ).fetchall() # searches for specific teacher name 
+            print(TeacherTBL)
+            
+        return render_template("Accounts.html",StudentTBL = SpecificStudent if SpecificStudent else [],TeacherTBL = TeacherTBL if TeacherTBL else [] ,error = None, success = "Successfull" )
+    except Exception as e:
+        print(f"Error: {e}") 
+        return render_template("Accounts.html", error = "Failed", success = None)
+
+
+@app.route("/MakeTest", methods = ['GET'] )
+def getTest():
+    return render_template("MakeTest.html")
+
+@app.route("/MakeTest", methods = ['POST'] )
+def createTest():
+    try:
+        conn.execute(text("""INSERT INTO Exam (TestID, Grade, StudentID, TeacherID) 
+                                VALUES (:testid, NULL, NULL, :teacherid)
+                        """), request.form)
+        conn.execute(text("""INSERT INTO Questions (QuestionsID, TestID, question, answer) 
+                                 VALUES (:qid, :testid, :quest, :ans)
+                        """), request.form)
+        conn.commit() # to add to the database
+        return render_template('MakeTest.html', error = None, success = "Successfull")
+    except Exception as e:
+        print(f"Failed: {e}")
+        return render_template('MakeTest.html', error=f"Failed: {e}", success=None)
+    
+    
 
 if __name__ == '__main__':
         app.run(debug=True)
