@@ -16,14 +16,11 @@
 
     {% if error %}
     <section class = "StudentCard-Container">
-        <h3>Students</h3>
-        {{error}}
+        
+        <h2>{{error}}</h2>
         </section>
 
-        <section class = "TeacherCard-Container">
-            <h3>Teacher</h3>
-            {{error}}
-            </section>
+        
     {% else %}
 
         {% if StudentTBL and not TeacherTBL %}
