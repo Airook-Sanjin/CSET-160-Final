@@ -9,9 +9,7 @@ engine = create_engine(conn_str, echo=True)
 conn = engine.connect()
 
 
-
-
-@app.route("/")
+@app.route("/Home")
 def Base():
         return render_template("Base.html")
 
@@ -63,6 +61,7 @@ def createAccount():
         print(f"Error: {e}") 
         return render_template("Register.html", error = "Failed", success = None)
 
+
 @app.route("/Account", methods = ['GET'] )
 def seeAccounts():
     StudentTBL = conn.execute(text('select * from student')).fetchall()
@@ -81,16 +80,21 @@ def SearchAccounts():
         
         if RadioValue == "1":  # check if any radio button is clicked. If Student selected, it will show only student Table
             SpecificStudent = conn.execute(text("Select * from student Where first_name = :first_name or last_name = :first_name or Concat(first_name,' ',last_name) = :first_name"),request.form ).fetchall() # searches for specific student 
-            print(SpecificStudent)
+            if SpecificStudent == []: #If user is not found it will be error
+                return render_template("Accounts.html", error = "Student Not Found", success = None)
+            print(f"Student Result: {SpecificStudent}")
         
-        else: # check if any radio button is clicked. Else, it will show only student Table
+        else: # check if any radio button is clicked. Else, it will show only teacher Table
+            
             TeacherTBL = conn.execute(text("Select * from teacher Where first_name = :first_name or last_name = :first_name or Concat(first_name,' ',last_name) = :first_name"),request.form ).fetchall() # searches for specific teacher name 
-            print(TeacherTBL)
+            if TeacherTBL == []: #If user is not found it will be error
+                return render_template("Accounts.html", error = "Teacher Not Found", success = None)
+            print(f"Teacher Result: {TeacherTBL}")
             
         return render_template("Accounts.html",StudentTBL = SpecificStudent if SpecificStudent else [],TeacherTBL = TeacherTBL if TeacherTBL else [] ,error = None, success = "Successfull" )
     except Exception as e:
         print(f"Error: {e}") 
-        return render_template("Accounts.html", error = "Failed", success = None)
+        return render_template("Accounts.html", error = "User Not Found", success = None)
 
 
 @app.route("/MakeTest", methods = ['GET'] )
