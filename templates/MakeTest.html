@@ -1,11 +1,11 @@
 {% extends '/Base.html'%}
 {% block body%}
 <div class="body">
-    <!-- {% if success == None%}
+    {% if success == None%}
         <h2>{{error}}</h2>
     {% elif error == None %}
         <h2>{{success}}</h2>
-    {% endif %} -->
+    {% endif %}
     <form class= "formContainer" action="/MakeTest" method="POST">
         <input type="number" name="testid" placeholder="Test ID" class="input_field" required> <br>
         <input type="number" name="teacherid" placeholder="Teacher ID" class="input_field" required> <br>

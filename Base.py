@@ -100,16 +100,28 @@ def getTest():
 @app.route("/MakeTest", methods = ['POST'] )
 def createTest():
     try:
+        print("Form Data:", request.form)
+        
+        # Check if TestID already exists
+        existing_exam = conn.execute(text("SELECT * FROM Exam WHERE TestID = :testid"), {"testid": request.form["testid"]}).fetchone()
+        if existing_exam:
+            return render_template('MakeTest.html', error="TestID already exists.", success=None)
+
+        # Check if TeacherID exists
+        existing_teacher = conn.execute(text("SELECT * FROM Teacher WHERE Tid = :teacherid"), {"teacherid": request.form["teacherid"]}).fetchone()
+        if not existing_teacher:
+            return render_template('MakeTest.html', error="TeacherID not found.", success=None)
+
+
         conn.execute(text("""INSERT INTO Exam (TestID, Grade, StudentID, TeacherID) 
                                 VALUES (:testid, NULL, NULL, :teacherid)
                         """), request.form)
         conn.execute(text("""INSERT INTO Questions (QuestionsID, TestID, question, answer) 
                                  VALUES (:qid, :testid, :quest, :ans)
                         """), request.form)
-        conn.commit() # to add to the database
+        conn.commit() 
         return render_template('MakeTest.html', error = None, success = "Successfull")
     except Exception as e:
-        print(f"Failed: {e}")
         return render_template('MakeTest.html', error=f"Failed: {e}", success=None)
     
     
