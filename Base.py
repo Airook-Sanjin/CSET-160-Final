@@ -9,9 +9,9 @@ engine = create_engine(conn_str, echo=True)
 conn = engine.connect()
 
 
-@app.route("/Home")
+@app.route("/")
 def Base():
-        return render_template("Base.html")
+    return render_template("Home.html")
 
 
 @app.route("/Register", methods = ['GET'])
@@ -34,7 +34,7 @@ def createAccount():
             else:
                 newID = int(prevID[0])+1
             
-            conn.execute(text("insert into student(Sid, first_name, last_name, password) values (:Sid, :first_name, :last_name, :password)"), {"Sid": newID, "first_name":request.form["first_name"], "last_name":request.form["last_name"],"password":request.form["password"]}
+            conn.execute(text("insert into student(Sid, first_name, last_name, password, Email) values (:Sid, :first_name, :last_name, :password, :Email)"), {"Sid": newID, "first_name":request.form["first_name"], "last_name":request.form["last_name"],"password":request.form["password"],"Email":request.form["Email"]}
                          )
             conn.commit() 
             result = conn.execute(text('select * from student')).fetchall() #For Debugging
@@ -47,7 +47,7 @@ def createAccount():
             else:
                 newID = int(prevID[0])+1 #increments 1 from prevID
                 
-            conn.execute(text("insert into teacher(Tid, first_name, last_name, password) values(:Tid, :first_name, :last_name, :password)"), {"Tid": newID, "first_name":request.form["first_name"], "last_name":request.form["last_name"],"password":request.form["password"]})
+            conn.execute(text("insert into teacher(Tid, first_name, last_name, password, Email) values(:Tid, :first_name, :last_name, :password, :Email)"), {"Tid": newID, "first_name":request.form["first_name"], "last_name":request.form["last_name"],"password":request.form["password"], "Email":request.form["Email"]})
             
             conn.commit()
             
