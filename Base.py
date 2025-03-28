@@ -60,6 +60,8 @@ def getAccount():
     
     return render_template("Register.html")
 
+#---------------------------------------------SIGN UP------------------------------------------------------
+
 @app.route("/Register", methods = ['POST'])
 def createAccount():   
     # debugging checking if we are getting data
