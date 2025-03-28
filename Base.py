@@ -9,10 +9,26 @@ engine = create_engine(conn_str, echo=True)
 conn = engine.connect()
 
 
-@app.route("/")
+@app.route("/", methods = ["GET"])
 def Base():
-    return render_template("Home.html")
+    
+    return render_template("Login.html")
 
+@app.route("/", methods = ["POST"])
+
+def LogIn():
+    try:
+        password = request.form["Password"]
+        ValidUser = conn.execute(text("select Email, password from student Where Email = :Email"),request.form ).fetchall() 
+        return render_template("Home.html")
+    except Exception as e:
+        print(f"Error: {e}") 
+        return render_template("Login.html", error = "User or password is not correct", success = None)
+
+@app.route("/Home")
+def ViewHome():
+    
+    return render_template("Home.html")
 
 @app.route("/Register", methods = ['GET'])
 def getAccount():
