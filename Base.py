@@ -1,14 +1,25 @@
-from flask import Flask,render_template, request
+from flask import Flask,render_template, request,g,session
 from sqlalchemy import create_engine, text, update
-
+import secrets 
 
 app = Flask(__name__)
+app.secret_key = secrets.token_hex(15) # Generates and sets A secret Key  for session with the secrets module
 
 conn_str = "mysql://root:cset155@localhost/examdb" # connects to DataBase
 engine = create_engine(conn_str, echo=True)
 conn = engine.connect()
 
-
+@app.before_request # before each request it will look for the values below
+def load_user():
+    if "Student" in session:
+        g.Student = session["Student"]
+    else:
+        g.Student = None
+    if "UserName" in session:
+        g.UserName = session["UserName"]
+    else:
+        g.UserName = None
+# -------------------------------------------
 @app.route("/", methods = ["GET"])
 def Base():
     
@@ -18,8 +29,22 @@ def Base():
 
 def LogIn():
     try:
-        password = request.form["Password"]
-        ValidUser = conn.execute(text("select Email, password from student Where Email = :Email"),request.form ).fetchall() 
+        ValidUser = (conn.execute(text("select Email, password from student Where Email = :Email"),request.form ).fetchall() + conn.execute(text("select Email, password from teacher Where Email = :Email"),request.form ).fetchall())
+        print(f" Valid USer :{ValidUser}")
+        print(f"Email: {ValidUser[0][0]}")
+        print(f"Query Result: {conn.execute(text("Select Email From student Where Email in(:Email)"),{"Email": ValidUser[0][0]}).fetchone()}")
+        if conn.execute(text("Select Email From student Where Email in(:Email)"),{"Email": ValidUser[0][0]}).fetchone():
+            UserName = conn.execute(text("Select first_name From student Where Email in(:Email)"),{"Email": ValidUser[0][0]}).fetchone()[0]
+            print("Student")
+            Student=True
+        else:
+            Student=False
+            print("Teacher")
+            UserName = conn.execute(text("Select first_name From teacher Where Email in(:Email)"),{"Email": ValidUser[0][0]}).fetchone()[0]
+        session["Student"] = Student
+        g.Student=Student
+        session["UserName"] = UserName # Storing Username across mutliple requests
+        g.UserName = UserName # Makes UserName availabe for current request for template
         return render_template("Home.html")
     except Exception as e:
         print(f"Error: {e}") 
