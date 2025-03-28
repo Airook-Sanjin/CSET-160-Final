@@ -1,3 +1,17 @@
+<style>
+    .questions-appear{
+        width: 20%;
+        height: 40vh;
+        background-color: #47db60;
+        overflow-y: scroll;
+        border-radius: 10px;
+    }
+    .body{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+    }
+</style>
 {% extends '/Base.html'%}
 {% block body%}
 <div class="body">
@@ -14,5 +28,17 @@
         <input type="submit" value="Add" class="input_submit">
         <!-- <input type="submit" value="Create" class="input_submit"> -->
     </form>
+    <div class="questions-appear">
+        {% for quest in questions %}
+            <ul style="list-style: none;">
+                <ul>TEST ID: <strong>{{quest[1]}}</strong>
+                    <ul>QID: <strong>{{quest[0]}}</strong></ul>
+                    <ul>QUESTION: <strong>{{quest[2]}}</strong></ul>
+                    <ul>ANSWER: <strong>{{quest[3]}}</strong></ul>
+                    <ul>TEACHER ID: <strong>{{quest[4]}}</strong></ul>
+                </ul>
+            </ul>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}
