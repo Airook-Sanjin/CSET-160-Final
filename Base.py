@@ -1,15 +1,15 @@
-from flask import Flask,render_template, request,g,session
+from flask import Flask,render_template, request, g, session
 from sqlalchemy import create_engine, text, update
 import secrets 
 
 app = Flask(__name__)
-app.secret_key = secrets.token_hex(15) # Generates and sets A secret Key  for session with the secrets module
+app.secret_key = secrets.token_hex(15) # Generates and sets A secret Key for session with the secrets module
 
 conn_str = "mysql://root:cset155@localhost/examdb" # connects to DataBase
 engine = create_engine(conn_str, echo=True)
 conn = engine.connect()
-
-@app.before_request # before each request it will look for the values below
+# ----------------------Before each load------------------------------------
+@app.before_request # Before each request it will look for the values below
 def load_user():
     if "Student" in session:
         g.Student = session["Student"]
@@ -19,7 +19,8 @@ def load_user():
         g.UserName = session["UserName"]
     else:
         g.UserName = None
-# -------------------------------------------
+# ----------------------Main---------------------------------------------------
+
 @app.route("/", methods = ["GET"])
 def Base():
     
@@ -30,26 +31,25 @@ def Base():
 def LogIn():
     try:
         ValidUser = (conn.execute(text("select Email, password from student Where Email = :Email"),request.form ).fetchall() + conn.execute(text("select Email, password from teacher Where Email = :Email"),request.form ).fetchall())
-        print(f" Valid USer :{ValidUser}")
-        print(f"Email: {ValidUser[0][0]}")
-        print(f"Query Result: {conn.execute(text("Select Email From student Where Email in(:Email)"),{"Email": ValidUser[0][0]}).fetchone()}")
-        if conn.execute(text("Select Email From student Where Email in(:Email)"),{"Email": ValidUser[0][0]}).fetchone():
-            UserName = conn.execute(text("Select first_name From student Where Email in(:Email)"),{"Email": ValidUser[0][0]}).fetchone()[0]
-            print("Student")
-            Student=True
-        else:
+    
+        if conn.execute(text("Select Email From student Where Email in(:Email)"),{"Email": ValidUser[0][0]}).fetchone(): #Checks if ValidUser is in DB-Student Table 
+            UserName = conn.execute(text("Select first_name From student Where Email in(:Email)"),{"Email": ValidUser[0][0]}).fetchone()[0] #grabs first_name from DB-Student Table
+            Student=True 
+        else: # if ValidUser is not in DB-Student Table
             Student=False
-            print("Teacher")
-            UserName = conn.execute(text("Select first_name From teacher Where Email in(:Email)"),{"Email": ValidUser[0][0]}).fetchone()[0]
-        session["Student"] = Student
-        g.Student=Student
-        session["UserName"] = UserName # Storing Username across mutliple requests
-        g.UserName = UserName # Makes UserName availabe for current request for template
-        return render_template("Home.html")
+            UserName = conn.execute(text("Select first_name From teacher Where Email in(:Email)"),{"Email": ValidUser[0][0]}).fetchone()[0] #grabs first_name from DB-Teacher Table
+
+        session["Student"] = Student # Storing Student in SessionStorage to see across mutliple requests
+        g.Student=Student # Makes Student availabe on current request for template
+        session["UserName"] = UserName # Storing Username in SessionStorage to see across mutliple requests
+        g.UserName = UserName # Makes UserName availabe on current request for template
+        
+        return render_template("Home.html") 
     except Exception as e:
         print(f"Error: {e}") 
         return render_template("Login.html", error = "User or password is not correct", success = None)
-
+    
+#-----------------------------------------HOMEPAGE---------------------------------------------------------
 @app.route("/Home")
 def ViewHome():
     
@@ -70,23 +70,25 @@ def createAccount():
         RadioValue= request.form["Teach-Stud"]
         if RadioValue == "1": #Checks whether Student or Teacher was clicked
             prevID = conn.execute(text("select Sid from student order by Sid desc Limit 1;")).fetchone() #Grabs last ID from Student table
-            if not prevID:
+            if not prevID: # If There is no prevID, newID is 1
                 newID = 1
             else:
-                newID = int(prevID[0])+1
+                newID = int(prevID[0])+1 # Increments 1 from prevID
             
             conn.execute(text("insert into student(Sid, first_name, last_name, password, Email) values (:Sid, :first_name, :last_name, :password, :Email)"), {"Sid": newID, "first_name":request.form["first_name"], "last_name":request.form["last_name"],"password":request.form["password"],"Email":request.form["Email"]}
                          )
             conn.commit() 
+            
             result = conn.execute(text('select * from student')).fetchall() #For Debugging
+            
             for row in result:
                 print(row)
         else:
             prevID = conn.execute(text("select Tid from teacher order by Tid desc Limit 1;")).fetchone() #Grabs last ID from Teacher table
-            if not prevID: #if There is no ID, newID is 1
+            if not prevID: # If There is no prevID, newID is 1
                 newID = 1
             else:
-                newID = int(prevID[0])+1 #increments 1 from prevID
+                newID = int(prevID[0])+1 # Increments 1 from prevID
                 
             conn.execute(text("insert into teacher(Tid, first_name, last_name, password, Email) values(:Tid, :first_name, :last_name, :password, :Email)"), {"Tid": newID, "first_name":request.form["first_name"], "last_name":request.form["last_name"],"password":request.form["password"], "Email":request.form["Email"]})
             
@@ -102,7 +104,7 @@ def createAccount():
         print(f"Error: {e}") 
         return render_template("Register.html", error = "Failed", success = None)
 
-
+# -----------------------------------------VIEW ACCOUNT PAGE ----------------------------------------------------------------
 @app.route("/Account", methods = ['GET'] )
 def seeAccounts():
     StudentTBL = conn.execute(text('select * from student')).fetchall()
@@ -136,7 +138,8 @@ def SearchAccounts():
     except Exception as e:
         print(f"Error: {e}") 
         return render_template("Accounts.html", error = "User Not Found", success = None)
-
+    
+#----------------------------------------------------MAKE TEST PAGE-------------------------------
 
 @app.route("/MakeTest", methods = ['GET'] )
 def getTest():
