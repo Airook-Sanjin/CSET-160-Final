@@ -115,23 +115,63 @@ def SearchAccounts():
 
 @app.route("/MakeTest", methods = ['GET'] )
 def getTest():
-    return render_template("MakeTest.html")
+    questions = []
+    return render_template("MakeTest.html", questions=questions)
 
-@app.route("/MakeTest", methods = ['POST'] )
+@app.route("/MakeTest", methods=['POST'])
 def createTest():
     try:
-        conn.execute(text("""INSERT INTO Exam (TestID, Grade, StudentID, TeacherID) 
-                                VALUES (:testid, NULL, NULL, :teacherid)
-                        """), request.form)
-        conn.execute(text("""INSERT INTO Questions (QuestionsID, TestID, question, answer) 
-                                 VALUES (:qid, :testid, :quest, :ans)
-                        """), request.form)
-        conn.commit() # to add to the database
-        return render_template('MakeTest.html', error = None, success = "Successfull")
+        print("Form Data:", request.form)
+
+        # Check if TestID exists in the Exam table
+        existing_exam = conn.execute(text("SELECT * FROM Exam WHERE TestID = :testid"), {"testid": request.form["testid"]}).fetchone()
+        if not existing_exam:
+            # Create a new TestID in Exam table
+            teacherid = request.form.get("teacherid")
+            if not teacherid:
+                return render_template('MakeTest.html', error="TeacherID is required to create a new test.", success=None)
+            
+            # Insert new TestID into Exam table
+            conn.execute(text("""
+                INSERT INTO Exam (TestID, Grade, StudentID, TeacherID) 
+                VALUES (:testid, NULL, NULL, :teacherid)
+            """), {
+                "testid": request.form["testid"],
+                "teacherid": teacherid
+            })
+
+        # Validate if TeacherID exists
+        existing_teacher = conn.execute(text("SELECT * FROM Teacher WHERE Tid = :teacherid"), {"teacherid": request.form["teacherid"]}).fetchone()
+        if not existing_teacher:
+            return render_template('MakeTest.html', error="TeacherID not found.", success=None)
+
+        # Get next QuestionsID dynamically
+        question_result = conn.execute(text("SELECT MAX(QuestionsID) AS max_qid FROM Questions"))
+        next_qid = question_result.fetchone()[0]  # Get the highest QuestionsID
+        if next_qid is None:
+            next_qid = 1  # Start from 1 if no records exist
+        else:
+            next_qid += 1  # Increment QuestionsID for the new question
+
+        # Insert into Questions table with dynamically generated QuestionsID
+        conn.execute(text("""
+            INSERT INTO Questions (QuestionsID, TestID, question, answer) 
+            VALUES (:qid, :testid, :quest, :ans)
+        """), {
+            "qid": next_qid,
+            "testid": request.form["testid"],
+            "quest": request.form["quest"],
+            "ans": request.form["ans"]
+        })
+
+        # Commit changes
+        questions = conn.execute(text("select q.*, t.tid, t.first_name, t.last_name from questions as q join exam as e on q.testid = e.testId join teacher as t where (e.teacherid = t.tid and q.questionsid) and e.Testid = :testid"), {"testid": request.form["testid"]}).all()
+        conn.commit()
+        return render_template('MakeTest.html', error=None, success="Successfully added the question to the test!", questions=questions)
     except Exception as e:
-        print(f"Failed: {e}")
-        return render_template('MakeTest.html', error=f"Failed: {e}", success=None)
-    
+        print(f"Insertion Error: {e}")
+        return render_template('MakeTest.html', error=f"Failed: {e}", success=None, questions=questions)
+
     
 
 if __name__ == '__main__':
