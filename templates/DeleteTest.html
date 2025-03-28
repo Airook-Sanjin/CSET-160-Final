@@ -1,0 +1,74 @@
+<style>
+    .questions-appear{
+        margin: auto 0;
+        width: 20%;
+        height: 40vh;
+        background-color: #47db60;
+        overflow-y: scroll;
+        border-radius: 10px;
+    }
+
+    .body-dq{
+        font-family: acumin-pro, system-ui, sans-serif;
+        margin: 0;
+        display: flex; 
+        flex-direction: row;
+        justify-content: space-around;
+        font-size: 14px;
+        background-color:var(--Primary);
+        align-items: start;
+        width: 100%;
+        min-height: 50vh;
+    }
+    .multi-form{
+        display: flex; 
+        flex-direction: row;
+        justify-content: space-around; 
+        width:30%;
+        min-height: 50vh
+    }
+</style>
+{% extends '/Base.html'%}
+{% block body%}
+<div class="body-dq">
+    <div class="multi-form">
+        <form class= "formContainer" action="/SearchTest" method="POST">
+            {% if success == None%}
+            <h2 style="color: red;">{{error}}</h2>
+            {% elif error == None %}
+                <h2 style="color: green;">{{success}}</h2>
+            {% endif %}
+            <input type="number" name="testid" placeholder="Test ID" class="input_field" required> <br>
+            <input type="submit" value="Search" class="input_submit">
+            <!-- <input type="submit" value="Create" class="input_submit"> -->
+        </form>
+
+        <form class="formContainer" action="/DeleteTest" method="POST">
+            {% if worked == None %}
+                <h2 style="color: red;">{{ nowork }}</h2>
+            {% elif nowork == None %}
+                <h2 style="color: green;">{{ worked }}</h2>
+            {% endif %}
+            <input type="number" name="testid" placeholder="Test ID" class="input_field" required> <br>
+            <input type="number" name="teacherid" placeholder="Teacher ID" class="input_field" required> <br>
+            <input type="submit" value="Delete" class="input_submit">
+        </form>
+    </div>   
+
+    <div class="questions-appear">
+        {% if Test %}
+            {% for t in Test %}
+                <ul style="list-style: none;">
+                    <ul>TEST ID: <strong>{{t[1]}}</strong>
+                        <ul>QUESTION: <strong>{{t[2]}}</strong></ul>
+                        <ul>ANSWER: <strong>{{t[3]}}</strong></ul>
+                        <ul>TEACHER ID: <strong>{{t[4]}}</strong></ul>
+                    </ul>
+                </ul>
+            {% endfor %}
+        {% else %}
+            <p>No questions found for this TestID.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

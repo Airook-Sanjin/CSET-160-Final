@@ -156,7 +156,62 @@ def createTest():
         print(f"Insertion Error: {e}")
         return render_template('MakeTest.html', error=f"Failed: {e}", success=None, questions=questions)
 
+# -----------------------
+# --- DELETE QUESTION ---
+# -----------------------
+@app.route("/DeleteTest", methods=['GET'])
+def getTestQ():
+    return render_template("DeleteTest.html", worked=None, nowork=None)
+
+@app.route("/DeleteTest", methods=['POST'])
+def deleteTest():
+    try:
+        # Step 1: Delete related rows in Questions
+        conn.execute(text("""
+            DELETE FROM Questions
+            WHERE TestID = :testid
+        """), {"testid": request.form["testid"]})
+
+        # Step 2: Delete the TestID in Exam
+        conn.execute(text("""
+            DELETE FROM Exam
+            WHERE Testid = :testid AND TeacherID = :teacherid
+        """), {"testid": request.form["testid"], "teacherid": request.form["teacherid"]})
+
+        conn.commit()  # Commit the changes
+        return render_template("DeleteTest.html", worked="Test and associated questions successfully deleted.", nowork=None)
+    except Exception as e:
+        print(f"Error during DELETE operation: {e}")  # Log the error for debugging
+        return render_template("DeleteTest.html", worked=None, nowork="An error occurred while deleting the Test.")
+
     
+# -----------------------
+# --- SEARCH QUESTION ---
+# -----------------------  
+@app.route("/SearchTest", methods = ['GET'] )
+def recieveQuest():
+    Test = []
+    return render_template("DeleteTest.html", Test=Test)
+
+@app.route("/SearchTest", methods=['POST']) 
+def SearchQuest():
+    try:
+        # Query to find the existing TestID
+        existing_testID = conn.execute(text("""
+            SELECT q.*, t.tid, t.first_name, t.last_name 
+            FROM questions AS q 
+            JOIN exam AS e ON q.testid = e.testId 
+            JOIN teacher AS t ON e.teacherid = t.tid 
+            WHERE e.Testid = :testid
+        """), {"testid": request.form["testid"]}).all()
+
+        if existing_testID and len(existing_testID) > 0:  # If TestID exists, return associated questions
+            return render_template("DeleteTest.html", error=None, success="TestID Found", Test=existing_testID)
+        else:  # If TestID doesn't exist
+            return render_template("DeleteTest.html", error="Test ID does not exist.", success=None, Test=None)
+    except Exception as e:
+        print(f"Error: {e}")  # Log the actual exception
+        return render_template("DeleteTest.html", error="An error occurred while processing your request.", success=None, Test=None)
 
 if __name__ == '__main__':
         app.run(debug=True)
