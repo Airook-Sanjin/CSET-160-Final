@@ -1,6 +1,12 @@
-{% extends '/Base.html'%}
-{% block body%}
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/style/header.css">
+    <title>Sign Up</title>
+</head>
+<body>
     <div class="body"><h1>Register Page<h1>
         {% if error %}
         <h2>{{error}}</h2>
@@ -16,7 +22,12 @@
                 <div class="radio-name"><input type="radio" name="Teach-Stud" placeholder="Student" class="input_field"value="1" >Student</input></div>
                 <div class="radio-name"><input type="radio" name="Teach-Stud" placeholder="Teacher" class="input_field" value="0">Teacher</input></div>
             </div>
-            <input type="submit" value="Create" class="input_submit">
+            <input type="submit" value="Sign Up" class="input_submit">
+            <button onclick="window.location.href = '/'" class ="input_submit">Log In</button>
         </form>
     </div>
-{% endblock %}
+
+</body>
+</html>
+
+    

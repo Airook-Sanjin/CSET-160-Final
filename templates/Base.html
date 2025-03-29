@@ -11,18 +11,27 @@
         <div class="">
           <img src="../static/images/logo.jpg" alt="Logo" class="logo">
           <ul class="barItem">
-
-            <li><button id="Home" onclick="window.location.href = '/'">HOME</button></li>
+            <li><button id="Home" onclick="window.location.href = '/Home'">HOME</button></li>
+            {% if g.Student %}
+            
+            <li><button id="ViewAccounts" onclick="window.location.href = '/Account'">VIEW ACCOUNTS</button></li>
+            
+            {% else %}
             <li><button id="ViewAccounts" onclick="window.location.href = '/Account'">VIEW ACCOUNTS</button></li>
             <li><button id="ViewAccounts" onclick="window.location.href = '/MakeTest'">MAKE TEST</button></li>
-            <li><button id="ViewAccounts" onclick="window.location.href = '/DeleteTest'">DELETE TEST</button></li>
+
+<!-- <!--             <li><button id="ViewAccounts" onclick="window.location.href = '/DeleteTest'">DELETE TEST</button></li> --> -->
+
+            {% endif %}
           </ul>
         </div>
 
         <div class="formSection barItem">
+          {% if g.UserName %}
+          <p>Hello {{g.UserName}}</p>
+          <button id="ViewAccounts" onclick="window.location.href = '/'">Log Out</button>
           
-          </form>
-
+          {%endif%}
           
         </div>
 
