@@ -38,6 +38,7 @@
             {% elif error == None %}
                 <h2 style="color: green;">{{success}}</h2>
             {% endif %}
+            <input type="hidden" name="page" value="DeleteTest">
             <input type="number" name="testid" placeholder="Test ID" class="input_field" required> <br>
             <input type="submit" value="Search" class="input_submit">
         </form>

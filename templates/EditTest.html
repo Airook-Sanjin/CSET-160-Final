@@ -38,11 +38,12 @@
             {% elif error == None %}
                 <h2 style="color: green;">{{success}}</h2>
             {% endif %}
+            <input type="hidden" name="page" value="EditTest">
             <input type="number" name="testid" placeholder="Test ID" class="input_field" required> <br>
             <input type="submit" value="Search" class="input_submit">
         </form>
 
-        <form class="formContainer" action="/DeleteTest" method="POST">
+        <form class="formContainer" action="/EditTest" method="POST">
             {% if worked == None %}
                 <h2 style="color: red;">{{ nowork }}</h2>
             {% elif nowork == None %}
@@ -50,7 +51,10 @@
             {% endif %}
             <input type="number" name="testid" placeholder="Test ID" class="input_field" required> <br>
             <input type="number" name="teacherid" placeholder="Teacher ID" class="input_field" required> <br>
-            <input type="submit" value="Delete" class="input_submit">
+            <input type="text" name="QID" placeholder="QID" class="input_field" required> <br>
+            <input type="text" name="quest" placeholder="Question" class="input_field" required> <br>
+            <input type="text" name="ans" placeholder="Answer" class="input_field" required> <br>
+            <input type="submit" value="Change" class="input_submit">
         </form>
     </div>   
 
@@ -59,6 +63,7 @@
             {% for t in Test %}
                 <ul style="list-style: none;">
                     <ul>TEST ID: <strong>{{t[1]}}</strong>
+                        <ul>QID: <strong>{{t[0]}}</strong></ul>
                         <ul>QUESTION: <strong>{{t[2]}}</strong></ul>
                         <ul>ANSWER: <strong>{{t[3]}}</strong></ul>
                         <ul>TEACHER ID: <strong>{{t[4]}}</strong></ul>
