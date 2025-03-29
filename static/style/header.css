@@ -180,7 +180,7 @@ input[type=radio]:checked + label:before{
   max-height: 27rem;
   padding:1rem;
   background-color: var(--Secondary);
-  border-radius: 50px;
+  border-radius: 10px;
   overflow-y: scroll;
   overflow-x: hidden;
 }

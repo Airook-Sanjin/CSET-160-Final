@@ -317,6 +317,7 @@ def recieveQuest():
 def SearchQuest():
     try:
         # Query to find the existing TestID
+        page = request.form.get("page", "DeleteTest")
         existing_testID = conn.execute(text("""
             SELECT q.*, t.tid, t.first_name, t.last_name 
             FROM questions AS q 
@@ -326,12 +327,60 @@ def SearchQuest():
         """), {"testid": request.form["testid"]}).all()
 
         if existing_testID and len(existing_testID) > 0:  # If TestID exists, return associated questions
-            return render_template("DeleteTest.html", error=None, success="TestID Found", Test=existing_testID)
+            return render_template(f"{page}.html", error=None, success="TestID Found", Test=existing_testID)
         else:  # If TestID doesn't exist
-            return render_template("DeleteTest.html", error="Test ID does not exist.", success=None, Test=None)
+            return render_template(f"{page}.html", error="Test ID does not exist.", success=None, Test=None)
     except Exception as e:
         print(f"Error: {e}")  # Log the actual exception
-        return render_template("DeleteTest.html", error="An error occurred while processing your request.", success=None, Test=None)
+        return render_template(f"{page}.html", error="An error occurred while processing your request.", success=None, Test=None)
+
+
+# -------------------
+# -----EDIT TEST-----
+# -------------------
+
+@app.route("/EditTest", methods=['GET'])
+def getEdit():
+    return render_template("EditTest.html", worked=None, nowork=None)
+
+@app.route("/EditTest", methods=['POST'])
+def EditTest():
+    testid = request.form.get("testid")
+    teacherid = request.form.get("teacherid")
+    quest = request.form.get("quest")
+    ans = request.form.get("ans")
+    QID = request.form.get("QID")
+
+    # Check if the test exists and belongs to the teacher
+    check = conn.execute(
+        text("SELECT * FROM exam WHERE Testid = :testid AND teacherid = :teacherid"),
+        {"testid": testid, "teacherid": teacherid}
+    ).fetchone()
+
+    if check:  # If a matching record is found
+        conn.execute(
+            text("UPDATE questions SET question = :quest, answer = :ans WHERE QuestionsID = :QID"),
+            {"quest": quest, "ans": ans, "QID": QID}
+        )
+        conn.commit()
+
+        # Retrieve the updated data after making changes
+        Test = conn.execute(
+            text("""
+                SELECT q.*, t.tid, t.first_name, t.last_name 
+                FROM questions AS q 
+                JOIN exam AS e ON q.testid = e.testId 
+                JOIN teacher AS t ON e.teacherid = t.tid 
+                WHERE e.Testid = :testid
+            """),
+            {"testid": testid}
+        ).fetchall()
+
+        return render_template("EditTest.html", worked="Test updated successfully!", nowork=None, Test=Test)
+
+    else:
+        return render_template("EditTest.html", worked=None, nowork="You're not authorized. This is not your test. Make a new one.", Test=[])
+
 
 if __name__ == '__main__':
         app.run(debug=True)
