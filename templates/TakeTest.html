@@ -1,1 +1,25 @@
 {% extends 'Base.html' %}
+{% block body %}
+{% if TestComplete %}
+<div>
+    <h2>Test Complete</h2>
+    <h2>{{Result}}%</h2>
+</div>
+{% else %}
+<form class= "formContainer" action="/TakeTest" method="POST">
+    
+    {%if Error %}
+    <H2>{{Error}}</H2>
+    {% else %}
+    <h2>Test Name: {{Test[0][0].title()}}</h2>
+    {% for info in Test %}
+    
+
+    <p><Strong>{{info[4]}}</Strong> : {{info[3]}}</p>
+    <input type="text" name = "Answer{{info[4]}}" placeholder="Answer Question for {{info[4]}}">
+    {% endfor %}
+    <input type="submit" Value ="Submit Test">
+    {% endif %}
+</form>
+{% endif %}
+{% endblock %}

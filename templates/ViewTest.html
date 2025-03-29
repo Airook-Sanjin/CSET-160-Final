@@ -1,0 +1,21 @@
+<title>{% block title %} Tests {% endblock %}</title>
+{% extends 'Base.html' %}
+{% block body %}
+<div class ="Student-Container">
+    <h3>AllTests</h3>
+        <section class = "StudentCard-Container">
+            
+        {% for Test in AllTests %}
+    
+        <ul class ="StudentCard">Test Name : <strong>{{Test[0]}}</strong>
+        <ul>Creator: {{Test[2]}}</ul> 
+        <ul>Number of Questions : {{Test[3]}}</ul> 
+        {% if g.Student%}
+        <ul> <a href="{{url_for('TestTaking',TestID = Test[1]) }}"<button>Take Test</button></ul></a>
+        {% else %}
+        {% endif %}
+        </ul>
+        {% endfor %}
+    </section>
+    </div>
+{% endblock %}
