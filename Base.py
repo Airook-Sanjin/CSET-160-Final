@@ -11,6 +11,10 @@ conn = engine.connect()
 # ----------------------Before each load------------------------------------
 @app.before_request # Before each request it will look for the values below
 def load_user():
+    if "TestID" in session:
+        g.TestID = session["TestID"]
+    else:
+        g.TestID = None
     if "Student" in session:
         g.Student = session["Student"]
     else:
@@ -19,7 +23,7 @@ def load_user():
         g.UserName = session["UserName"]
     else:
         g.UserName = None
-# ----------------------Main---------------------------------------------------
+# --------Main------------------------------
 
 @app.route("/", methods = ["GET"])
 def Base():
@@ -49,7 +53,7 @@ def LogIn():
         print(f"Error: {e}") 
         return render_template("Login.html", error = "User or password is not correct", success = None)
     
-#-----------------------------------------HOMEPAGE---------------------------------------------------------
+#------------HOMEPAGE---------------
 @app.route("/Home")
 def ViewHome():
     
@@ -60,7 +64,7 @@ def getAccount():
     
     return render_template("Register.html")
 
-#---------------------------------------------SIGN UP------------------------------------------------------
+#--------SIGN UP----------------
 
 @app.route("/Register", methods = ['POST'])
 def createAccount():   
@@ -106,7 +110,7 @@ def createAccount():
         print(f"Error: {e}") 
         return render_template("Register.html", error = "Failed", success = None)
 
-# -----------------------------------------VIEW ACCOUNT PAGE ----------------------------------------------------------------
+# ----VIEW ACCOUNT PAGE -------------
 @app.route("/Account", methods = ['GET'] )
 def seeAccounts():
     StudentTBL = conn.execute(text('select * from student')).fetchall()
@@ -140,8 +144,78 @@ def SearchAccounts():
     except Exception as e:
         print(f"Error: {e}") 
         return render_template("Accounts.html", error = "User Not Found", success = None)
+# -------View ALL TESTS----------------
+@app.route("/ViewTest")
+def ViewAllTest(): 
+    try:
+        AllTests = conn.execute(text("""
+                SELECT e.TestName, t.tid, t.last_name, COUNT(DISTINCT q.QuestionsID) as TotalQuestions
+                FROM questions AS q 
+                JOIN exam AS e ON q.testid = e.testId 
+                JOIN teacher AS t ON e.teacherid = t.tid Group By e.TestID,e.TestName,t.last_name;""")).fetchall()
+        print(AllTests)
+        return render_template("ViewTest.html", error = None, success = "TestsFound",AllTests = AllTests)
+    except:
+        return render_template("ViewTest.html",error = "User Not Found", success = None, AllTests = AllTests)
+
+
     
-#----------------------------------------------------MAKE TEST PAGE-------------------------------
+#  --------------Take Test-----------
+@app.route("/TakeTest", methods=["GET"])
+def TestTaking():
+    TestID = request.args.get("TestID") #Grabs argument from ViewTest
+    
+    session["TestID"] = TestID # Storing TestID in SessionStorage to JUST so I can see it in the POST - THere must be a better way
+    g.TestID=TestID # Makes TestID availabe on current request for template
+    print(f"GET: {TestID}") # FOR DEBUGGIN
+    try:
+        TestInfo = conn.execute(text(""" 
+                SELECT e.TestName, e.TestID,q.answer, q.question,q.questionsID
+                FROM questions AS q 
+                JOIN exam AS e ON q.testid = e.TestID 
+                WHERE e.testID = :TestID"""),{"TestID":TestID}).fetchall() # Joins and Grabs Tables-Exam and questions 
+        print(f"TestINFO GET : {TestInfo}") # FOR DEBUGGIN
+        return render_template("TakeTest.html", error = None, success="TestID Found", Test = TestInfo)
+    except: 
+        return render_template("TakeTest.html", error = "Test ID invalid", success=None, Test = TestInfo)
+@app.route("/TakeTest", methods=["POST"])
+def SubmitTest():
+    g.TestID = session["TestID"]
+    
+    TestInfo = conn.execute(text(""" 
+                SELECT e.TestName, e.TestID,q.answer, q.question,q.questionsID
+                FROM questions AS q 
+                JOIN exam AS e ON q.testid = e.TestID 
+                WHERE e.testID = :TestID"""),{"TestID":g.TestID}).fetchall()
+    
+    ListofQuestionID = conn.execute(text(""" 
+                SELECT q.questionsID
+                FROM questions AS q 
+                JOIN exam AS e ON q.testid = e.TestID 
+                WHERE e.testID = :TestID"""),{"TestID":g.TestID}).fetchall()
+    print(f"LOQ :{ListofQuestionID}")
+    
+    print(f"TestINFO POST : {TestInfo}") # FOR DEBUGGIN
+    Score=0
+    try:
+        for QNumber in ListofQuestionID:
+            Result = conn.execute(text("""
+            Select e.Testid, Count(q.Question) as TotalQuestions, Cast(sum( Case When q.answer = :Answer Then 1 else 0 end) as Unsigned) as AnsweredCorrectly
+            FROM questions AS q 
+            JOIN exam AS e ON q.testid = e.testId
+            Where e.testid = :TestID and q.questionsID = :questionID
+            Group by e.testid"""),{"TestID": g.TestID, "Answer": request.form[f"Answer{QNumber[0]}"],"questionID":QNumber[0]}).fetchone()
+            print(f"ANSWER : {request.form[f'Answer{QNumber[0]}']}") # FOR DEBUGGIN
+            print(f"RESULT : {Result}") # FOR DEBUGGIN
+            if Result[2]==1:
+                Score+=1
+        print(int(Score/ len(TestInfo) *100)) # FOR DEBUGGIN
+        testComplete = True
+        
+        return render_template("TakeTest.html", error = None, success="Submission Successful", Test = TestInfo, Result = int(Score/ len(TestInfo) *100), TestComplete = testComplete)
+    except:
+        return render_template("TakeTest.html", error = "Failed", success=None, TestComplete=None)
+#--------MAKE TEST PAGE----------
 
 @app.route("/MakeTest", methods = ['GET'] )
 def getTest():
@@ -232,7 +306,7 @@ def deleteTest():
 
     
 # -----------------------
-# --- SEARCH QUESTION ---
+# --- SEARCH TEST ---
 # -----------------------  
 @app.route("/SearchTest", methods = ['GET'] )
 def recieveQuest():
