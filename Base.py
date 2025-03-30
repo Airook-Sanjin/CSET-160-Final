@@ -149,7 +149,7 @@ def SearchAccounts():
 def ViewAllTest(): 
     try:
         AllTests = conn.execute(text("""
-                SELECT e.TestName, t.tid, t.last_name, COUNT(DISTINCT q.QuestionsID) as TotalQuestions
+                SELECT e.TestName,t.tid, t.last_name, COUNT(DISTINCT q.QuestionsID) as TotalQuestions,e.TestID
                 FROM questions AS q 
                 JOIN exam AS e ON q.testid = e.testId 
                 JOIN teacher AS t ON e.teacherid = t.tid Group By e.TestID,e.TestName,t.last_name;""")).fetchall()
@@ -194,7 +194,7 @@ def SubmitTest():
     print(f"LOQ :{ListofQuestionID}")
     
     print(f"TestINFO POST : {TestInfo}") # FOR DEBUGGIN
-    Score=0
+    Score = 0
     try:
         for QNumber in ListofQuestionID:
             Result = conn.execute(text("""
