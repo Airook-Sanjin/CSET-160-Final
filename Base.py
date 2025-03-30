@@ -23,8 +23,8 @@ def load_user():
         g.UserName = session["UserName"]
     else:
         g.UserName = None
-# --------Main------------------------------
 
+# --------Main------------------------------
 @app.route("/", methods = ["GET"])
 def Base():
     
@@ -65,7 +65,6 @@ def getAccount():
     return render_template("Register.html")
 
 #--------SIGN UP----------------
-
 @app.route("/Register", methods = ['POST'])
 def createAccount():   
     # debugging checking if we are getting data
@@ -144,6 +143,7 @@ def SearchAccounts():
     except Exception as e:
         print(f"Error: {e}") 
         return render_template("Accounts.html", error = "User Not Found", success = None)
+
 # -------View ALL TESTS----------------
 @app.route("/ViewTest")
 def ViewAllTest(): 
@@ -157,9 +157,7 @@ def ViewAllTest():
         return render_template("ViewTest.html", error = None, success = "TestsFound",AllTests = AllTests)
     except:
         return render_template("ViewTest.html",error = "User Not Found", success = None, AllTests = AllTests)
-
-
-    
+  
 #  --------------Take Test-----------
 @app.route("/TakeTest", methods=["GET"])
 def TestTaking():
@@ -215,8 +213,8 @@ def SubmitTest():
         return render_template("TakeTest.html", error = None, success="Submission Successful", Test = TestInfo, Result = Score, TestComplete = testComplete)
     except:
         return render_template("TakeTest.html", error = "Failed", success=None, TestComplete=None)
-#--------MAKE TEST PAGE----------
 
+#--------MAKE TEST PAGE----------
 @app.route("/MakeTest", methods = ['GET'] )
 def getTest():
     questions = []
@@ -227,54 +225,73 @@ def createTest():
     try:
         print("Form Data:", request.form)
 
-        # Check if TestID exists in the Exam table
-        existing_exam = conn.execute(text("SELECT * FROM Exam WHERE TestID = :testid"), {"testid": request.form["testid"]}).fetchone()
-        if not existing_exam:
-            # Create a new TestID in Exam table
-            teacherid = request.form.get("teacherid")
-            if not teacherid:
+        test_id = request.form["testid"]
+        teacher_id = request.form["teacherid"]
+        testname = request.form["Testname"]
+        
+        # Step 1: Validate TestID exists in Exam table and matches TeacherID
+        validation_query = text("""
+            SELECT TeacherID
+            FROM Exam
+            WHERE TestID = :testid
+        """)
+        existing_exam = conn.execute(validation_query, {"testid": test_id}).fetchone()
+
+        if existing_exam:
+            if str(existing_exam[0]) != str(teacher_id):
+                # Debug: Log mismatch
+                print(f"Validation failed: TestID {test_id} is not associated with TeacherID {teacher_id}.")
+                return render_template('MakeTest.html', error="Mismatch between TestID and TeacherID.", success=None)
+        else:
+            # If TestID doesn't exist, create it
+            if not teacher_id:
                 return render_template('MakeTest.html', error="TeacherID is required to create a new test.", success=None)
-            
+
             # Insert new TestID into Exam table
             conn.execute(text("""
-                INSERT INTO Exam (TestID, Grade, StudentID, TeacherID) 
-                VALUES (:testid, NULL, NULL, :teacherid)
-            """), {
-                "testid": request.form["testid"],
-                "teacherid": teacherid
-            })
+                INSERT INTO Exam (TestName,TestID, Grade, StudentID, TeacherID) 
+                VALUES (:Testname,:testid, NULL, NULL, :teacherid)
+            """), {"testid": test_id, "teacherid": teacher_id, "Testname": testname})
 
-        # Validate if TeacherID exists
-        existing_teacher = conn.execute(text("SELECT * FROM Teacher WHERE Tid = :teacherid"), {"teacherid": request.form["teacherid"]}).fetchone()
+        # Step 2: Validate TeacherID exists
+        existing_teacher = conn.execute(text("""
+            SELECT * 
+            FROM Teacher 
+            WHERE Tid = :teacherid
+        """), {"teacherid": teacher_id}).fetchone()
         if not existing_teacher:
             return render_template('MakeTest.html', error="TeacherID not found.", success=None)
 
-        # Get next QuestionsID dynamically
-        question_result = conn.execute(text("SELECT MAX(QuestionsID) AS max_qid FROM Questions"))
-        next_qid = question_result.fetchone()[0]  # Get the highest QuestionsID
+        # Step 3: Get next QuestionsID dynamically
+        question_result = conn.execute(text("""
+            SELECT MAX(QuestionsID) AS max_qid 
+            FROM Questions
+        """))
+        next_qid = question_result.fetchone()[0]
         if next_qid is None:
-            next_qid = 1  # Start from 1 if no records exist
+            next_qid = 1
         else:
-            next_qid += 1  # Increment QuestionsID for the new question
+            next_qid += 1
 
-        # Insert into Questions table with dynamically generated QuestionsID
+        # Step 4: Insert into Questions table
         conn.execute(text("""
             INSERT INTO Questions (QuestionsID, TestID, question, answer) 
             VALUES (:qid, :testid, :quest, :ans)
-        """), {
-            "qid": next_qid,
-            "testid": request.form["testid"],
-            "quest": request.form["quest"],
-            "ans": request.form["ans"]
-        })
+        """), {"qid": next_qid, "testid": test_id, "quest": request.form["quest"], "ans": request.form["ans"]})
 
-        # Commit changes
-        questions = conn.execute(text("select q.*, t.tid, t.first_name, t.last_name from questions as q join exam as e on q.testid = e.testId join teacher as t where (e.teacherid = t.tid and q.questionsid) and e.Testid = :testid"), {"testid": request.form["testid"]}).all()
+        # Commit changes and fetch updated questions list
+        questions = conn.execute(text("""
+            SELECT e.TestName, e.TestID,q.answer, q.question,q.questionsID,e.TeacherID
+            FROM questions AS q 
+            JOIN exam AS e ON q.testid = e.testId
+            Where e.TestID = :testid
+        """), {"testid": test_id}).all()
         conn.commit()
         return render_template('MakeTest.html', error=None, success="Successfully added the question to the test!", questions=questions)
+
     except Exception as e:
         print(f"Insertion Error: {e}")
-        return render_template('MakeTest.html', error=f"Failed: {e}", success=None, questions=questions)
+        return render_template('MakeTest.html', error=f"Failed: {e}", success=None, questions=[])
 
 # -----------------------
 # --- DELETE QUESTION ---
@@ -286,27 +303,53 @@ def getTestQ():
 @app.route("/DeleteTest", methods=['POST'])
 def deleteTest():
     try:
-        # Step 1: Delete related rows in Questions
-        conn.execute(text("""
+        test_id = request.form["testid"]
+        teacher_id = request.form["teacherid"]
+
+        # Debug: Print input values
+        print(f"Received TestID: {test_id}, TeacherID: {teacher_id}")
+
+        # Step 1: Validate the existence of TestID and TeacherID pair
+        validation_query = text("""
+            SELECT COUNT(*) AS count
+            FROM Exam
+            WHERE TestID = :testid AND TeacherID = :teacherid
+        """)
+        result = conn.execute(validation_query, {"testid": test_id, "teacherid": teacher_id}).fetchone()
+
+        # Access the count value using the correct index
+        count = result[0]  # Access the first element of the tuple
+
+        if count == 0:
+            # Debug: Log mismatch
+            print("Validation failed: TestID and TeacherID do not match.")
+            return render_template("DeleteTest.html", worked=None, nowork="Invalid TestID or TeacherID pair.")
+
+        # Step 2: Delete related rows in Questions
+        delete_questions_query = text("""
             DELETE FROM Questions
             WHERE TestID = :testid
-        """), {"testid": request.form["testid"]})
+        """)
+        conn.execute(delete_questions_query, {"testid": test_id})
 
-        # Step 2: Delete the TestID in Exam
-        conn.execute(text("""
+        # Step 3: Delete the TestID in Exam
+        delete_exam_query = text("""
             DELETE FROM Exam
-            WHERE Testid = :testid AND TeacherID = :teacherid
-        """), {"testid": request.form["testid"], "teacherid": request.form["teacherid"]})
+            WHERE TestID = :testid AND TeacherID = :teacherid
+        """)
+        conn.execute(delete_exam_query, {"testid": test_id, "teacherid": teacher_id})
 
         conn.commit()  # Commit the changes
         return render_template("DeleteTest.html", worked="Test and associated questions successfully deleted.", nowork=None)
+
     except Exception as e:
-        print(f"Error during DELETE operation: {e}")  # Log the error for debugging
+        # Debug: Log the exception
+        print(f"Error during DELETE operation: {e}")
         return render_template("DeleteTest.html", worked=None, nowork="An error occurred while deleting the Test.")
 
     
 # -----------------------
-# --- SEARCH TEST ---
+# --- SEARCH TEST -------
 # -----------------------  
 @app.route("/SearchTest", methods = ['GET'] )
 def recieveQuest():

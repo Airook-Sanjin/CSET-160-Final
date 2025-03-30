@@ -12,10 +12,10 @@
     
         <ul class ="Test Card">
         <p>Test Name : <strong>{{Test[0]}}</strong></p>
-        <p>Creator: {{Test[2]}}</p> 
-        <p>Number of Questions : {{Test[3]}}</p> 
+        <p>Creator: <strong>{{Test[2]}}</strong></p> 
+        <p>Number of Questions : <strong>{{Test[3]}}</strong></p> 
         {% if g.Student%}
-        <a id="TakeA" href="{{url_for('TestTaking',TestID = Test[1]) }}"<button class=" input_submit">Take Test</button></a>
+        <a id="TakeA" href="{{url_for('TestTaking',TestID = Test[1]) }}"><button class=" input_submit">Take Test</button></a>
         {% else %}
         {% endif %}
         </ul>
