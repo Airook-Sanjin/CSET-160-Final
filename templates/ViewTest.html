@@ -20,7 +20,7 @@
         <p>Creator: <strong>{{Test[2]}}</strong></p> 
         <p>Number of Questions : <strong>{{Test[3]}}</strong></p> 
         {% if g.Student%}
-        <a id="TakeA" href="{{url_for('TestTaking',TestID = Test[1]) }}"><button class=" input_submit">Take Test</button></a>
+        <a id="TakeA" href="{{url_for('TestTaking',TestID = Test[4]) }}"><button class=" input_submit">Take Test</button></a>
         {% else %}
         {% endif %}
         </ul>
