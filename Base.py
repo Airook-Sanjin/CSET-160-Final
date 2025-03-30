@@ -204,15 +204,15 @@ def SubmitTest():
             FROM questions AS q 
             JOIN exam AS e ON q.testid = e.testId
             Where e.testid = :TestID and q.questionsID = :questionID
-            Group by e.testid"""),{"TestID": g.TestID, "Answer": request.form[f"Answer{QNumber[0]}"],"questionID":QNumber[0]}).fetchone()
+            Group by e.testid"""),{"TestID": g.TestID, "Answer": request.form[f"Answer{QNumber[0]}"],"questionID":QNumber[0]}).fetchone() # Cast() makes sure q.answer is a INT - Unsigned means that It won't be a negative
             print(f"ANSWER : {request.form[f'Answer{QNumber[0]}']}") # FOR DEBUGGIN
             print(f"RESULT : {Result}") # FOR DEBUGGIN
-            if Result[2]==1:
+            if Result[2]==1: # Checks if q.answer is one if so it will increment Score by 1
                 Score+=1
-        print(int(Score/ len(TestInfo) *100)) # FOR DEBUGGIN
-        testComplete = True
+        Score = (Score/ len(TestInfo)) *100 # Turns Score into percentage
+        testComplete = True # Marks Test as complete
         
-        return render_template("TakeTest.html", error = None, success="Submission Successful", Test = TestInfo, Result = int(Score/ len(TestInfo) *100), TestComplete = testComplete)
+        return render_template("TakeTest.html", error = None, success="Submission Successful", Test = TestInfo, Result = Score, TestComplete = testComplete)
     except:
         return render_template("TakeTest.html", error = "Failed", success=None, TestComplete=None)
 #--------MAKE TEST PAGE----------

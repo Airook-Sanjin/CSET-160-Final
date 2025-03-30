@@ -1,85 +1,86 @@
 <title>{% block title %} View Account {% endblock %}</title>
 {% extends 'Base.html'%}
+{% block link %}<link rel="stylesheet" href="../static/style/ViewPages.css">{% endblock link %}
 {% block body%}
 
 <div class = "Account-Container">
-    <form class="SearchBar-Form" action="/Account" method="POST" >
+    <form class="SearchBar- Form" action="/Account" method="POST" >
         <h3>Search</h3>
-        <input type="text" placeholder="Enter Name" name="first_name" required/>
+        <input class="input_field" type="text" placeholder="Enter Name" name="first_name" required/>
         
         <div class="RadioInput">
-            <div class="radio-name"><input type="radio" name="Teach-Stud" placeholder="Student" class="input_field"value="1" required >Student</input></div>
-            <div class="radio-name"><input type="radio" name="Teach-Stud" placeholder="Teacher" class="input_field" value="0" required>Teacher</input></div>
+            <div class="radio-name"><input type="radio" name="Teach-Stud" placeholder="Student" class="input_radio"value="1" required >Student</input></div>
+            <div class="radio-name"><input type="radio" name="Teach-Stud" placeholder="Teacher" class="input_radio" value="0" required>Teacher</input></div>
         </div>
         <input type="submit" value="Search" class="input_submit">
     </form>
 
     {% if error %}
-    <section class = "StudentCard-Container">
+    
         
         <h2>{{error}}</h2>
-        </section>
+        
 
         
     {% else %}
 
         {% if StudentTBL and not TeacherTBL %}
-        <div class ="Student-Container">
+        <div class ="Student- Container">
         <h3>Students</h3>
-            <section class = "StudentCard-Container">
+            <section class = "Student Card-Container">
                 
             {% for Student in StudentTBL %}
         
-            <ul class ="StudentCard">ID : <strong>{{Student[0]}}</strong>
-            <ul>Name : {{Student[1].title()}} {{Student[2].title()}}</ul> 
-            <ul>Email : {{Student[4].title()}}</ul> 
-            </ul>
+            <ul class ="Student Card">
+                <p><Strong>{{Student[1].title()}} {{Student[2].title()}}</Strong></p> 
+                <p><strong>Email:</strong> {{Student[4].title()}}</p> 
+                </ul>
         
             {% endfor %}
 
             </section>
         </div>
         {% elif TeacherTBL and not StudentTBL %}
-        <div class="Teacher-Container">
+        <div class="Teacher- Container">
             <h3>Teacher</h3>
-            <section class = "TeacherCard-Container">
+            <section class = "Teacher Card-Container">
                 
             {% for Teacher in TeacherTBL %}
             
-            <ul class ="TeacherCard">ID : <strong>{{Teacher[0]}}</strong>
-             <ul>Name : {{Teacher[1].title()}} {{Teacher[2].title()}} </ul>
-             <ul>Email : {{Teacher[4].title()}}</ul> 
-            </ul>
+            <ul class ="Teacher Card">
+                <p><Strong>{{Teacher[1].title()}} {{Teacher[2].title()}} </Strong></p>
+                <p><strong>Email:</strong> {{Teacher[4].title()}}</p> 
+               </ul>
             
             {% endfor %}
             </section>
         </div>
         {% elif TeacherTBL or StudentTBL %}
-        <div class ="Student-Container">
+        <div class ="Student- Container">
             <h3>Students</h3>
-            <section class = "StudentCard-Container">
+            <section class = "Student Card-Container">
             
             {% for Student in StudentTBL  %}
         
-            <ul class ="StudentCard">ID : <strong>{{Student[0]}}</strong>
-            <ul>Name : {{Student[1].title()}} {{Student[2].title()}}</ul> 
-            <ul>Email : {{Student[4].title()}}</ul> 
-            </ul>
+            <ul class ="Student Card">
+                <p><Strong>{{Student[1].title()}} {{Student[2].title()}}</Strong></p> 
+                <p><strong>Email:</strong> {{Student[4].title()}}</p> 
+                </ul>
         
             {% endfor %}
 
             </section>
         </div>
-        <div class="Teacher-Container">
+        <div class="Teacher- Container">
             <h3>Teacher</h3>
-            <section class = "TeacherCard-Container">
+            <section class = "Teacher Card-Container">
                 
             {% for Teacher in TeacherTBL %}
             
-            <ul class ="TeacherCard">ID : <strong>{{Teacher[0]}}</strong>
-            <ul>Name : {{Teacher[1].title()}} {{Teacher[2].title()}} </ul>
-            <ul>Email : {{Teacher[4].title()}}</ul> 
-            </ul>
+            <ul class ="Teacher Card">
+                <p><Strong>{{Teacher[1].title()}} {{Teacher[2].title()}} </Strong></p>
+                <p><strong>Email:</strong> {{Teacher[4].title()}}</p> 
+               </ul>
             
             {% endfor %}
             </section>
