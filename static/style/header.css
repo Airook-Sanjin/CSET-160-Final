@@ -1,18 +1,20 @@
 :root{
-  --FONT: hsl(0, 0%, 18%);
-  --Primary: hsl(40, 34%, 76%);
-  --Secondary:hsl(32, 27%, 52%);
-  --Tertiary:hsl(35, 36%, 87%);
+  --FONT: hsl(95, 11%, 22%);
+  --Primary: hsl(45, 20%, 88%);
+  --Secondary:hsl(23, 12%, 71%);
+  --Tertiary:hsl(34, 26%, 30%);
 
 
 
 }
 .barItem {
-  display: inline-block;
+  display: flex;
+  align-items: center;
 }
 
 .logo {
-  width: 45px;
+  font-size: 2.5em;
+  color: var(--Tertiary);
 }
 
 header li {
@@ -23,7 +25,7 @@ header li {
 }
 
 .topBar {
-  background-color: var(--Tertiary);
+  background-color: var(--Secondary);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -42,6 +44,14 @@ header li {
   border-radius: 5px;
   margin-left: 10px;
 }
+#Profile{
+  background:none;
+}
+#Profile:hover .logo{
+  background:none;
+  color:black;
+  transition:.5s ease-in-out;
+}
 
 .mainDiv {
   margin: auto;
@@ -59,7 +69,8 @@ header button {
   margin-left: 10px;
 }
 header button:hover{
-  background-color: hsl(0, 0%, 84%);
+  background-color: var(--Primary);
+  transition: .2s ease-in-out;
 }
 header button:active{
   background-color: hsl(0, 0%, 80%);
@@ -103,105 +114,15 @@ body {
   max-width:100vh;
 
 }
-.Account-Container{
-  display: flex;
-  gap: .5rem;
-  justify-content: space-around;
-}
 
-.SearchBar-Form{
-  width:20%;
-}
-.formContainer{
-  display: flex;
-  width: 20%;
-  margin: auto 0;
-  flex-direction: column;
-  align-items: center;
-  justify-content:center;
-  /* padding-top: 4rem; */
-}
-.RadioInput{
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  width: 100%;
-  padding:0px 0px;
-}
-.radio-name{
-  display: flex;
-  flex-direction: row;
-  width: 30%;
-}
-input[type=radio] + label:before{
-  height:12px;
-  width:12px;
-  margin-right: 2px;
-  content: " ";
-  display:inline-block;
-  vertical-align: baseline;
-  border:1px solid #ca2a2a;
-}
-input[type=radio]:checked + label:before{
-  background:gold;
-}
-
-.input_field {
-  width: 100%;
-  padding: 8px 20px;
-  /* margin: 8px 0; */
-  display: inline-block;
-  border: 1px solid var(--Tertiary);
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-.input_submit {
-  width: 100%;
-  background-color: var(--Secondary);
-  color: white;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.input_submit:hover {
-  background-color: hsl(32, 27%, 42%);
-}
-.StudentCard-Container, .TeacherCard-Container{
-  display: grid;
-  grid-template-columns: repeat(2,1fr);
-  justify-items: center;
-  /* column-gap: 1rem; */
-  width:30rem;
-  /* min-width:35rem; */
-  max-height: 27rem;
-  padding:1rem;
-  background-color: var(--Secondary);
-  border-radius: 10px;
-  overflow-y: scroll;
-  overflow-x: hidden;
-}
-.StudentCard, .TeacherCard{
-  max-width:15rem;
-  height:8rem;
-  border-radius: 10px;
-  background-color: var(--Tertiary);
-  padding:1.3rem;
-  transition: .2s ease-in-out; 
-  box-shadow: 0px 4px 4px hsla(0, 0%, 0%, 0.188),
-    0px 12px 12px hsla(0, 0%, 0%, 0.082);
-}
 
 /* -------------------------- footer ------------------------------------------- */
 .footer {
   display: flex;
   flex-flow: row wrap;
   padding: 30px 30px 20px 30px;
-  color: #2f2f2f;
-  background-color: var(--Tertiary);
+  color: var(--FONT);
+  background-color: var(--Secondary);
   border-top: 1px solid #e5e5e5;
 }
 
@@ -234,7 +155,7 @@ input[type=radio]:checked + label:before{
 
 .footer address {
   font-style: normal;
-  color: #999;
+  color: var(--Primary);
 }
 
 .footer__btn {
@@ -243,9 +164,9 @@ input[type=radio]:checked + label:before{
   justify-content: center;
   height: 36px;
   max-width: max-content;
-  background-color: rgb(33, 33, 33, 0.07);
+  background-color: var(--Tertiary);
   border-radius: 100px;
-  color: #2f2f2f;
+  color: var(--Primary);
   line-height: 0;
   margin: 0.6em 0;
   font-size: 1rem;
@@ -276,7 +197,7 @@ input[type=radio]:checked + label:before{
 }
 
 .nav__ul a {
-  color: #999;
+  color: var(--Primary);
 }
 
 .nav__ul--extra {
@@ -287,7 +208,7 @@ input[type=radio]:checked + label:before{
 .legal {
   display: flex;
   flex-wrap: wrap;
-  color: #999;
+  color: var(--Primary);
 }
 
 .legal__links {

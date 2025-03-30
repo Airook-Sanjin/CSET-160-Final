@@ -1,10 +1,12 @@
 :root{
-    --FONT: hsl(0, 0%, 18%);
-    --Primary: hsl(40, 34%, 76%);
-    --Secondary:hsl(32, 27%, 52%);
-    --Tertiary:hsl(35, 36%, 87%);
-  }
-
+  --FONT: hsl(95, 11%, 22%);
+  --Primary: hsl(45, 20%, 88%);
+  --Secondary:hsl(23, 12%, 71%);
+  --Tertiary:hsl(34, 26%, 30%);
+}
+h1 ,h2{
+  color: var(--FONT);
+}
 *,
 *:before,
 *:after {
@@ -46,15 +48,15 @@ body {
     padding: 8px 20px;
     /* margin: 8px 0; */
     display: inline-block;
-    border: 1px solid var(--Tertiary);
+    border: 1px solid var(--Primary);
     border-radius: 4px;
     box-sizing: border-box;
   }
   
   .input_submit {
     width: 100%;
-    background-color: var(--Secondary);
-    color: white;
+    background-color: var(--Tertiary);
+    color:var(--Primary);
     padding: 14px 20px;
     border: none;
     border-radius: 4px;

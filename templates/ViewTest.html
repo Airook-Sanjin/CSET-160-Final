@@ -1,21 +1,26 @@
 <title>{% block title %} Tests {% endblock %}</title>
+
 {% extends 'Base.html' %}
+{% block link %}<link rel="stylesheet" href="../static/style/ViewPages.css">{% endblock link %}
 {% block body %}
-<div class ="Student-Container">
+<div class="Body-Container">
+<div class ="Student Container">
     <h3>AllTests</h3>
-        <section class = "StudentCard-Container">
+        <section class = "Test Card-Container">
             
         {% for Test in AllTests %}
     
-        <ul class ="StudentCard">Test Name : <strong>{{Test[0]}}</strong>
-        <ul>Creator: {{Test[2]}}</ul> 
-        <ul>Number of Questions : {{Test[3]}}</ul> 
+        <ul class ="Test Card">
+        <p>Test Name : <strong>{{Test[0]}}</strong></p>
+        <p>Creator: {{Test[2]}}</p> 
+        <p>Number of Questions : {{Test[3]}}</p> 
         {% if g.Student%}
-        <ul> <a href="{{url_for('TestTaking',TestID = Test[1]) }}"<button>Take Test</button></ul></a>
+        <a id="TakeA" href="{{url_for('TestTaking',TestID = Test[1]) }}"<button class=" input_submit">Take Test</button></a>
         {% else %}
         {% endif %}
         </ul>
         {% endfor %}
     </section>
     </div>
+</div>
 {% endblock %}
