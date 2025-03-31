@@ -34,12 +34,16 @@
         <p>Creator: <strong>{{Test[2]}}</strong></p> 
         <p>Number of Questions : <strong>{{Test[3]}}</strong></p> 
         {% if g.Student%}
-        {% if Test[6] == 0 %}
-        <a id="TakeA" class="Test input_submit" href="{{url_for('TestTaking',TestID = Test[4]) }}">Take Test </a>
-        {%else%}
-        <p>Grade: {{Test[5]}}%</p>
+            {% if Test[6] == 0 %}
+            <a id="TakeA" class="Test input_submit" href="{{url_for('TestTaking',TestID = Test[4]) }}">Take Test </a>
+            {%else%}
+            <p>Grade: {{Test[5]}}%</p>
+            <a id="TakeA" class="Test input_submit" href="{{url_for('reviewTests',TestID = Test[4]) }}">ReviewTest </a>
         {% endif %}
+        {% else %}
+            <a id="TakeA" class="Test input_submit" href="{{url_for('reviewTests',TestID = Test[4]) }}">ReviewTest </a>
         {% endif %}
+        
         </ul>
         {% endfor %}
     </section>

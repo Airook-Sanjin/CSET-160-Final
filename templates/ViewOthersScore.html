@@ -1,4 +1,80 @@
+<style>
+    .Review.Container{
+        height:100%;
+        width:100%;
+        max-width:100vw;
+        max-height:100vw;
+
+    }
+    .Review.Card{
+        width:90%;
+        height:100%;
+        max-height: 50rem;
+    }
+    .Review.Card-Container{
+        max-height:100vw;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .Review.form{
+        height:10%;
+        min-height: 10vh;
+
+    }
+
+</style>
 {% extends 'Base.html' %}
+{% block link %}<link rel="stylesheet" href="../static/style/ViewPages.css">{% endblock link %}
 {%block body %}
-<h2>others score</h2>
+<div class ="Body-Container">
+<div class = "Review Container">
+    <div class = "Review Card-Container">
+        
+        
+
+        
+        {% for student in Test %}
+        <div class="Review Card">
+        <h2>Name: {{student.StudentName.title() }}</h2>
+        <h3>Test Name : {{student.TestName }}</h3>
+        <h4>Grade: {{student.Grade}}%</h4>
+        {% if g.Student %}
+            {% else %}
+                <form class = "Review form">
+                    <input type="text" name="EditGrade" id="GradeEDit">
+                    <input type="submit" name="SubmitGrade" id="SubmitGrade" value="Submit Grade">
+                </form>
+        {% endif %}
+        
+        <table border="1">
+            <Tr>
+                <th>Question ID</th>
+                <th>Question</th>
+                <th>Correct Answer</th>
+                <th>Student Answer</th>
+               
+            </Tr>
+            <thead>
+                <tbody>
+                    {% for question in student.Questions %}
+                    
+                    <tr>
+                        <td>{{question.QuestionsID}}</td>
+                        <td>{{question.Question}}</td>
+                        <td>{{question.Answer}}</td>
+                        <td>{{question.StudentAnswer}}</td>
+                        
+                    </tr>
+                    
+                    {% endfor %}
+                    
+                </tbody>
+            </thead>
+        </table>
+    </div>
+        {% endfor %}
+        
+    </div>
+    </div>
+    </div>
+    
 {% endblock %}
