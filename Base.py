@@ -1,4 +1,4 @@
-from flask import Flask,render_template, request, g, session
+from flask import Flask, render_template, request, session, redirect, url_for, g
 from sqlalchemy import create_engine, text, update
 import secrets 
 
@@ -52,7 +52,8 @@ def LogIn():
         session["User"] = User # Storing User in SessionStorage to see across mutliple requests
         g.User = User # Makes UserName availabe on current request for template
         print(g.User["Name"])
-        return render_template("Home.html") 
+        
+        return render_template("Home.html")
     except Exception as e:
         print(f"Error: {e}") 
         return render_template("Login.html", error = "User or password is not correct", success = None)
@@ -242,7 +243,8 @@ def createTest():
         print("Form Data:", request.form)
 
         test_id = request.form["testid"]
-        teacher_id = request.form["teacherid"]
+        teacher_id = session.get("User", {}).get("ID")
+        # teacher_id = request.form["teacherid"]
         testname = request.form["Testname"]
         
         # Step 1: Validate TestID exists in Exam table and matches TeacherID
@@ -320,7 +322,8 @@ def getTestQ():
 def deleteTest():
     try:
         test_id = request.form["testid"]
-        teacher_id = request.form["teacherid"]
+        teacher_id = session.get("User", {}).get("ID")
+        # teacher_id = request.form["teacherid"]  # Get teacher ID from the form (or use session if needed)
 
         # Debug: Print input values
         print(f"Received TestID: {test_id}, TeacherID: {teacher_id}")
@@ -332,36 +335,47 @@ def deleteTest():
             WHERE TestID = :testid AND TeacherID = :teacherid
         """)
         result = conn.execute(validation_query, {"testid": test_id, "teacherid": teacher_id}).fetchone()
-
-        # Access the count value using the correct index
+        
+        # Access the count value
         count = result[0]  # Access the first element of the tuple
-
         if count == 0:
             # Debug: Log mismatch
             print("Validation failed: TestID and TeacherID do not match.")
             return render_template("DeleteTest.html", worked=None, nowork="Invalid TestID or TeacherID pair.")
 
-        # Step 2: Delete related rows in Questions
+        # Step 2: Delete related rows in the Grade table
+        print("Deleting related rows in Grade table...")
+        delete_grade_query = text("""
+            DELETE FROM Grade
+            WHERE TestID = :testid
+        """)
+        conn.execute(delete_grade_query, {"testid": test_id})
+
+        # Step 3: Delete related rows in the Questions table
+        print("Deleting related rows in Questions table...")
         delete_questions_query = text("""
             DELETE FROM Questions
             WHERE TestID = :testid
         """)
         conn.execute(delete_questions_query, {"testid": test_id})
 
-        # Step 3: Delete the TestID in Exam
+        # Step 4: Delete the TestID from the Exam table
+        print("Deleting test from Exam table...")
         delete_exam_query = text("""
             DELETE FROM Exam
             WHERE TestID = :testid AND TeacherID = :teacherid
         """)
         conn.execute(delete_exam_query, {"testid": test_id, "teacherid": teacher_id})
 
-        conn.commit()  # Commit the changes
-        return render_template("DeleteTest.html", worked="Test and associated questions successfully deleted.", nowork=None)
+        # Step 5: Commit the transaction
+        print("Committing transaction...")
+        conn.commit()
+        return render_template("DeleteTest.html", worked="Test and associated data successfully deleted.", nowork=None)
 
     except Exception as e:
         # Debug: Log the exception
         print(f"Error during DELETE operation: {e}")
-        return render_template("DeleteTest.html", worked=None, nowork="An error occurred while deleting the Test.")
+        return render_template("DeleteTest.html", worked=None, nowork=f"An error occurred: {str(e)}")
 
     
 # -----------------------
@@ -405,7 +419,8 @@ def getEdit():
 @app.route("/EditTest", methods=['POST'])
 def EditTest():
     testid = request.form.get("testid")
-    teacherid = request.form.get("teacherid")
+    # teacherid = request.form.get("teacherid")
+    teacher_id = session.get("User", {}).get("ID")
     quest = request.form.get("quest")
     ans = request.form.get("ans")
     QID = request.form.get("QID")
@@ -413,7 +428,7 @@ def EditTest():
     # Check if the test exists and belongs to the teacher
     check = conn.execute(
         text("SELECT * FROM exam WHERE Testid = :testid AND teacherid = :teacherid"),
-        {"testid": testid, "teacherid": teacherid}
+        {"testid": testid, "teacherid": teacher_id}
     ).fetchone()
 
     if check:  # If a matching record is found

@@ -37,7 +37,7 @@
         {% if Test[6] == 0 %}
         <a id="TakeA" class="Test input_submit" href="{{url_for('TestTaking',TestID = Test[4]) }}">Take Test </a>
         {%else%}
-        <p>Grade: {{Test[5]}}</p>
+        <p>Grade: {{Test[5]}}%</p>
         {% endif %}
         {% endif %}
         </ul>
