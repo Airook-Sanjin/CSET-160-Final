@@ -36,7 +36,7 @@
         <div class="formSection barItem">
           
           {% if g.User %}
-          <p>Hello {{g.User["Name"]}}</p>
+          <p>Hello {{g.User["Name"].title()}}</p>
           <button id="Profile"><iconify-icon class="logo" icon="mdi:account-circle" ></iconify-icon></button>
           <button id="ViewAccounts" onclick="window.location.href = '/'">Log Out</button>
           
