@@ -159,7 +159,7 @@ def ViewAllTest():
                 JOIN exam AS e ON q.testid = e.testId 
                 JOIN teacher AS t ON e.teacherid = t.tid
                 left Join grade as g on g.TestID = e.testid
-                Group By e.TestID,e.TestName,t.last_name,g.grade;""")).fetchall()
+                Group By e.TestID,e.TestName,t.last_name,g.grade""")).fetchall()
         print(AllTests)
         return render_template("ViewTest.html", error = None, success = "TestsFound",AllTests = AllTests)
     except:
@@ -454,8 +454,10 @@ def EditTest():
 
     else:
         return render_template("EditTest.html", worked=None, nowork="You're not authorized. This is not your test. Make a new one.", Test=[])
-
-
+# -----------------View TestResponses--------
+@app.route("/ReviewTest")
+def ReviewTest():
+    return render_template("ReviewTest.html")
 if __name__ == '__main__':
         app.run(debug=True)
     

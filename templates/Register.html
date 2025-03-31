@@ -1,19 +1,27 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../static/style/header.css">
+    <link rel="stylesheet" href="../static/style/Login.css">
     <title>Sign Up</title>
+    <style>
+        .radio-name .input_field{
+            padding: 0;
+        }
+    </style>
 </head>
 <body>
-    <div class="body"><h1>Register Page<h1>
+    <div class="Login-Container">
+        <h1>Register Page</h1>
         {% if error %}
-        <h2>{{error}}</h2>
+        <h2> {{error}} </h2>
         {% else %}
         <h2>{{success}}</h2>
         {% endif %}
-        <form class ="formContainer"action="/Register" method="POST">
+        <form class ="SignUpLogIn"action="/Register" method="POST">
             <input type="text" name="first_name" placeholder="First name" class="input_field"> <br>
             <input type="text" name="last_name" placeholder="Last name" class="input_field"> <br>
             <input type="text" name="Email" placeholder="Email"required class="input_field"> <br>
@@ -26,8 +34,9 @@
             <button onclick="window.location.href = '/'" class ="input_submit">Log In</button>
         </form>
     </div>
-
+    
 </body>
 </html>
+    
 
     
