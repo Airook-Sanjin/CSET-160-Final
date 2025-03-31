@@ -1,4 +1,4 @@
-from flask import Flask,render_template, request, g, session
+from flask import Flask, render_template, request, session, redirect, url_for, g
 from sqlalchemy import create_engine, text, update
 import secrets 
 
@@ -52,7 +52,8 @@ def LogIn():
         session["User"] = User # Storing User in SessionStorage to see across mutliple requests
         g.User = User # Makes UserName availabe on current request for template
         print(g.User["Name"])
-        return render_template("Home.html") 
+        
+        return render_template("Home.html")
     except Exception as e:
         print(f"Error: {e}") 
         return render_template("Login.html", error = "User or password is not correct", success = None)
@@ -242,7 +243,8 @@ def createTest():
         print("Form Data:", request.form)
 
         test_id = request.form["testid"]
-        teacher_id = request.form["teacherid"]
+        teacher_id = session.get("User", {}).get("ID")
+        # teacher_id = request.form["teacherid"]
         testname = request.form["Testname"]
         
         # Step 1: Validate TestID exists in Exam table and matches TeacherID
@@ -320,6 +322,7 @@ def getTestQ():
 def deleteTest():
     try:
         test_id = request.form["testid"]
+        # teacher_id = session.get("User", {}).get("ID")
         teacher_id = request.form["teacherid"]
 
         # Debug: Print input values
