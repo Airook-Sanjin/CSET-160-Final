@@ -28,7 +28,6 @@ def load_user():
 # --------Main------------------------------
 @app.route("/", methods = ["GET"])
 def Base():
-    
     return render_template("Login.html")
 
 @app.route("/", methods = ["POST"])
@@ -157,13 +156,13 @@ def ViewAllTest():
     try:
         AllTests = conn.execute(text("""
                 SELECT e.TestName, t.tid, t.last_name, COUNT(DISTINCT q.QuestionsID) as TotalQuestions,e.TestID, g.grade,Case When g.Grade is Not NULL Then True else False end as TestTaken,s.sid as StudentID
-	FROM student AS s 
-	Cross JOIN exam AS e
-    LEFT Join grade as g on g.TestID = e.testid and  g.StudentID = s.sid
-	LEFT JOIN teacher AS t ON e.teacherid = t.tid
-	LEFT Join questions as q on q.testid = e.testid
-    Group by s.sid,e.TestID,e.TestName,t.tid,t.last_name,g.grade,g.StudentID
-    having s.sid = :StudentID;"""),{"StudentID":g.User["ID"]}).fetchall()
+                  FROM student AS s 
+                  Cross JOIN exam AS e
+                  LEFT Join grade as g on g.TestID = e.testid and  g.StudentID = s.sid
+                  LEFT JOIN teacher AS t ON e.teacherid = t.tid
+                  LEFT Join questions as q on q.testid = e.testid
+                  Group by s.sid,e.TestID,e.TestName,t.tid,t.last_name,g.grade,g.StudentID
+                  having s.sid = :StudentID;"""),{"StudentID":g.User["ID"]}).fetchall()
         # LEFT JOIN
         # 
         # 
@@ -475,9 +474,11 @@ def EditTest():
     else:
         return render_template("EditTest.html", worked=None, nowork="You're not authorized. This is not your test. Make a new one.", Test=[])
 # -----------------View TestResponses--------
-@app.route("/ReviewTest")
-def ReviewTest():
-    return render_template("ReviewTest.html")
+@app.route("/ViewOthersScore", methods=['GET'])
+def viewTests():
+    return render_template("ViewOthersScore.html")
+
+
 if __name__ == '__main__':
         app.run(debug=True)
     

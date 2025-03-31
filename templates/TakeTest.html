@@ -6,7 +6,17 @@
     .Test.Account-Container{
     justify-content: center;
     }
-    
+    .Test.Container{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        justify-items: center;
+        justify-self:center;
+    }
+    .info{
+        text-align: center;
+        
+    }
     
 </style>
 <title>{% block title %} Taking {{Test[0][0].title()}} {% endblock %}</title>
@@ -14,9 +24,13 @@
 {% block link %}<link rel="stylesheet" href="../static/style/ViewPages.css">{% endblock link %}
 {% block body %}
 {% if TestComplete %}
-<div class=" Test Container">
-    <h2>Test Complete</h2>
-    <h2>{{Result}}%</h2>
+<div class="Test Container">
+    <div class="info">
+        <h2>Test Complete</h2>
+        <h2>{{Result}}%</h2>
+    </div>
+    <button id="TakeA" class="Test input_submit" onclick="window.location.href = '/ViewOthersScore'">View other scores for this test</button>
+    
 </div>
 {% else %}
 <div class = "Test Account-Container">
