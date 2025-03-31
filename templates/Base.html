@@ -35,8 +35,8 @@
 
         <div class="formSection barItem">
           
-          {% if g.UserName %}
-          <p>Hello {{g.UserName}}</p>
+          {% if g.User %}
+          <p>Hello {{g.User["Name"]}}</p>
           <button id="Profile"><iconify-icon class="logo" icon="mdi:account-circle" ></iconify-icon></button>
           <button id="ViewAccounts" onclick="window.location.href = '/'">Log Out</button>
           

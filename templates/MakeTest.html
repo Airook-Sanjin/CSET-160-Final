@@ -2,8 +2,22 @@
     .Test.Card{
         height:13rem;
         width:18rem;
-    
     }
+    .Test.Container{
+        max-width: 50.5vw;
+        width:100%;
+    }
+    .Test.Card-Container{
+        grid-template-columns: repeat(2,1fr);
+        max-height:70vh;
+    }
+    .Test.input_submit{
+        display:flex;
+
+        width:60%;
+        align-self: center;
+    }
+    
 </style>
 {% extends '/Base.html'%}
 {% block link %}<link rel="stylesheet" href="../static/style/ViewPages.css">{% endblock link %}
@@ -23,8 +37,8 @@
         <input type="text" name="ans" placeholder="Answer" class="input_field" required> <br>
         <input type="submit" value="Add" class="input_submit">
     </form>
-    <div class="Container">
-    <div class="Card-Container">
+    <div class="Test Container">
+    <div class="Test Card-Container">
         {% for quest in questions %}
             <ul class="Test Card">
                 <p>TEST ID: <strong>{{quest[1]}}</strong></p>
