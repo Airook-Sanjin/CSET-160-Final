@@ -6,7 +6,9 @@
     .Test.Account-Container{
     justify-content: center;
     }
-    
+    .Test.Container{
+        margin:0;
+    }
     
 </style>
 <title>{% block title %} Taking {{Test[0][0].title()}} {% endblock %}</title>
@@ -14,9 +16,10 @@
 {% block link %}<link rel="stylesheet" href="../static/style/ViewPages.css">{% endblock link %}
 {% block body %}
 {% if TestComplete %}
-<div class=" Test Container">
+<div class="Test Container">
     <h2>Test Complete</h2>
     <h2>{{Result}}%</h2>
+    <!-- <a id="TakeA" class="Test input_submit" href="{{url_for()}}">View all test </a> -->
 </div>
 {% else %}
 <div class = "Test Account-Container">
