@@ -1,12 +1,26 @@
+<style>
+    .Form{
+        text-align: left;
+        height:100%;
+    }
+    .Test.Account-Container{
+    justify-content: center;
+    }
+    
+    
+</style>
+<title>{% block title %} Taking {{Test[0][0].title()}} {% endblock %}</title>
 {% extends 'Base.html' %}
+{% block link %}<link rel="stylesheet" href="../static/style/ViewPages.css">{% endblock link %}
 {% block body %}
 {% if TestComplete %}
-<div>
+<div class=" Test Container">
     <h2>Test Complete</h2>
     <h2>{{Result}}%</h2>
 </div>
 {% else %}
-<form class= "formContainer" action="/TakeTest" method="POST">
+<div class = "Test Account-Container">
+<form class= "Form" action="/TakeTest" method="POST">
     
     {%if Error %}
     <H2>{{Error}}</H2>
@@ -16,10 +30,12 @@
     
 
     <p><Strong>{{info[4]}}</Strong> : {{info[3]}}</p>
-    <input type="text" name = "Answer{{info[4]}}" placeholder="Answer Question for {{info[4]}}">
+    <input class="input_field" type="text" name = "Answer{{info[4]}}" placeholder="Answer Question for {{info[4]}}">
     {% endfor %}
-    <input type="submit" Value ="Submit Test">
+    <input class = "Test input_submit" type="submit" Value ="Submit Test">
     {% endif %}
 </form>
+
 {% endif %}
+</div>
 {% endblock %}

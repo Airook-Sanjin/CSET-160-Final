@@ -1,10 +1,29 @@
+<style>
+    .Test.Card{
+        height: 11rem; ;
+    }
+    .Test.Container{
+        max-width: 50.5vw;
+        width:100%;
+    }
+    .Test.Card-Container{
+        grid-template-columns: repeat(2,1fr);
+        max-height:70vh;
+    }
+    .Test.input_submit{
+        display:flex;
+
+        width:60%;
+        align-self: center;
+    }
+</style>
 <title>{% block title %} Tests {% endblock %}</title>
 
 {% extends 'Base.html' %}
 {% block link %}<link rel="stylesheet" href="../static/style/ViewPages.css">{% endblock link %}
 {% block body %}
 <div class="Body-Container">
-<div class ="Student Container">
+<div class ="Test Container">
     <h3>AllTests</h3>
         <section class = "Test Card-Container">
             
@@ -15,8 +34,11 @@
         <p>Creator: <strong>{{Test[2]}}</strong></p> 
         <p>Number of Questions : <strong>{{Test[3]}}</strong></p> 
         {% if g.Student%}
-        <a id="TakeA" href="{{url_for('TestTaking',TestID = Test[4]) }}"><button class=" input_submit">Take Test</button></a>
-        {% else %}
+        {% if Test[6] == 0 %}
+        <a id="TakeA" class="Test input_submit" href="{{url_for('TestTaking',TestID = Test[4]) }}">Take Test </a>
+        {%else%}
+        <p>Grade: {{Test[5]}}</p>
+        {% endif %}
         {% endif %}
         </ul>
         {% endfor %}

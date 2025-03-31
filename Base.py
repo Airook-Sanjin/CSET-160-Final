@@ -19,8 +19,9 @@ def load_user():
         g.Student = session["Student"]
     else:
         g.Student = None
-    if "UserName" in session:
-        g.UserName = session["UserName"]
+        
+    if "User" in session:
+        g.User = session["User"]
     else:
         g.UserName = None
 
@@ -35,19 +36,22 @@ def Base():
 def LogIn():
     try:
         ValidUser = (conn.execute(text("select Email, password from student Where Email = :Email"),request.form ).fetchall() + conn.execute(text("select Email, password from teacher Where Email = :Email"),request.form ).fetchall())
-    
+        User={}
         if conn.execute(text("Select Email From student Where Email in(:Email)"),{"Email": ValidUser[0][0]}).fetchone(): #Checks if ValidUser is in DB-Student Table 
-            UserName = conn.execute(text("Select first_name From student Where Email in(:Email)"),{"Email": ValidUser[0][0]}).fetchone()[0] #grabs first_name from DB-Student Table
+            User["Name"] = conn.execute(text("Select first_name From student Where Email in(:Email)"),{"Email": ValidUser[0][0]}).fetchone()[0] #grabs first_name from DB-Student Table
+            User["ID"] = conn.execute(text("Select Sid From student Where Email in(:Email)"),{"Email": ValidUser[0][0]}).fetchone()[0]
             Student=True 
+            print(User["Name"])
         else: # if ValidUser is not in DB-Student Table
             Student=False
-            UserName = conn.execute(text("Select first_name From teacher Where Email in(:Email)"),{"Email": ValidUser[0][0]}).fetchone()[0] #grabs first_name from DB-Teacher Table
-
+            User["Name"] = conn.execute(text("Select first_name From teacher Where Email in(:Email)"),{"Email": ValidUser[0][0]}).fetchone()[0] #grabs first_name from DB-Teacher Table
+            User["ID"] = conn.execute(text("Select tid From teacher Where Email in(:Email)"),{"Email": ValidUser[0][0]}).fetchone()[0]
+            print(User["Name"])
         session["Student"] = Student # Storing Student in SessionStorage to see across mutliple requests
         g.Student=Student # Makes Student availabe on current request for template
-        session["UserName"] = UserName # Storing Username in SessionStorage to see across mutliple requests
-        g.UserName = UserName # Makes UserName availabe on current request for template
-        
+        session["User"] = User # Storing User in SessionStorage to see across mutliple requests
+        g.User = User # Makes UserName availabe on current request for template
+        print(g.User["Name"])
         return render_template("Home.html") 
     except Exception as e:
         print(f"Error: {e}") 
@@ -149,10 +153,12 @@ def SearchAccounts():
 def ViewAllTest(): 
     try:
         AllTests = conn.execute(text("""
-                SELECT e.TestName,t.tid, t.last_name, COUNT(DISTINCT q.QuestionsID) as TotalQuestions,e.TestID
+                SELECT e.TestName, t.tid, t.last_name, COUNT(DISTINCT q.QuestionsID) as TotalQuestions,e.TestID, g.grade,Case When g.Grade is Not NULL Then True else False end as TestTaken
                 FROM questions AS q 
                 JOIN exam AS e ON q.testid = e.testId 
-                JOIN teacher AS t ON e.teacherid = t.tid Group By e.TestID,e.TestName,t.last_name;""")).fetchall()
+                JOIN teacher AS t ON e.teacherid = t.tid
+                left Join grade as g on g.TestID = e.testid
+                Group By e.TestID,e.TestName,t.last_name,g.grade;""")).fetchall()
         print(AllTests)
         return render_template("ViewTest.html", error = None, success = "TestsFound",AllTests = AllTests)
     except:
@@ -179,6 +185,8 @@ def TestTaking():
 @app.route("/TakeTest", methods=["POST"])
 def SubmitTest():
     g.TestID = session["TestID"]
+    g.User = session["User"]
+    
     
     TestInfo = conn.execute(text(""" 
                 SELECT e.TestName, e.TestID,q.answer, q.question,q.questionsID
@@ -203,11 +211,19 @@ def SubmitTest():
             JOIN exam AS e ON q.testid = e.testId
             Where e.testid = :TestID and q.questionsID = :questionID
             Group by e.testid"""),{"TestID": g.TestID, "Answer": request.form[f"Answer{QNumber[0]}"],"questionID":QNumber[0]}).fetchone() # Cast() makes sure q.answer is a INT - Unsigned means that It won't be a negative
+            
             print(f"ANSWER : {request.form[f'Answer{QNumber[0]}']}") # FOR DEBUGGIN
             print(f"RESULT : {Result}") # FOR DEBUGGIN
             if Result[2]==1: # Checks if q.answer is one if so it will increment Score by 1
                 Score+=1
-        Score = (Score/ len(TestInfo)) *100 # Turns Score into percentage
+        Score = round((Score/ len(TestInfo)) *100) # Turns Score into percentage
+        conn.execute(text("""
+        INSERT INTO grade
+	        (TestID,grade,StudentID)
+        Values
+	        (:TestID,:Result,:StudentID);
+"""),{"TestID":g.TestID, "Result":Score,"StudentID":g.User["ID"]})
+        conn.commit()
         testComplete = True # Marks Test as complete
         
         return render_template("TakeTest.html", error = None, success="Submission Successful", Test = TestInfo, Result = Score, TestComplete = testComplete)
@@ -249,8 +265,8 @@ def createTest():
 
             # Insert new TestID into Exam table
             conn.execute(text("""
-                INSERT INTO Exam (TestName,TestID, Grade, StudentID, TeacherID) 
-                VALUES (:Testname,:testid, NULL, NULL, :teacherid)
+                INSERT INTO Exam (TestName,TestID, TeacherID) 
+                VALUES (:Testname,:testid, :teacherid)
             """), {"testid": test_id, "teacherid": teacher_id, "Testname": testname})
 
         # Step 2: Validate TeacherID exists
