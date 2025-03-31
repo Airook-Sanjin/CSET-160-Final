@@ -151,16 +151,21 @@ def SearchAccounts():
 # -------View ALL TESTS----------------
 @app.route("/ViewTest")
 def ViewAllTest(): 
+    g.User = session["User"]
+    print(f" USER ID: {g.User}")
     try:
         AllTests = conn.execute(text("""
                 SELECT e.TestName, t.tid, t.last_name, COUNT(DISTINCT q.QuestionsID) as TotalQuestions,e.TestID, g.grade,Case When g.Grade is Not NULL Then True else False end as TestTaken,s.sid as StudentID
-                FROM student AS s 
-                Cross JOIN exam AS e
-                LEFT Join grade as g on g.TestID = e.testid and  g.StudentID = s.sid
-                LEFT JOIN teacher AS t ON e.teacherid = t.tid
-                LEFT Join questions as q on q.testid = e.testid
-                Group by s.sid,e.TestID,e.TestName,t.tid,t.last_name,g.grade,g.StudentID
-                having s.sid = :StudentID;"""),{"StudentID":g.User["ID"]}).fetchall()
+                  FROM student AS s 
+                  Cross JOIN exam AS e
+                  LEFT Join grade as g on g.TestID = e.testid and  g.StudentID = s.sid
+                  LEFT JOIN teacher AS t ON e.teacherid = t.tid
+                  LEFT Join questions as q on q.testid = e.testid
+                  Group by s.sid,e.TestID,e.TestName,t.tid,t.last_name,g.grade,g.StudentID
+                  having s.sid = :StudentID;"""),{"StudentID":g.User["ID"]}).fetchall()
+        # LEFT JOIN
+        # 
+        # 
         print(AllTests)
         return render_template("ViewTest.html", error = None, success = "TestsFound",AllTests = AllTests)
     except:
@@ -188,6 +193,7 @@ def TestTaking():
 def SubmitTest():
     g.TestID = session["TestID"]
     g.User = session["User"]
+    print(g.User["Name"], g.User["ID"])
     
     
     TestInfo = conn.execute(text(""" 
@@ -218,19 +224,31 @@ def SubmitTest():
             print(f"RESULT : {Result}") # FOR DEBUGGIN
             if Result[2]==1: # Checks if q.answer is one if so it will increment Score by 1
                 Score+=1
+        
+        
+            conn.execute(text("""
+            INSERT INTO grade
+	            (TestID,QuestionsID,StudentAnswer,StudentID)
+            Values
+                (:TestID,:QuestionsID,:StudentAnswer,:StudentID)"""),{"TestID":g.TestID,"QuestionsID": QNumber[0],"StudentAnswer":request.form[f"Answer{QNumber[0]}"], "StudentID":g.User["ID"]})
+            
+            
         Score = round((Score/ len(TestInfo)) *100) # Turns Score into percentage
         conn.execute(text("""
-        INSERT INTO grade
-	        (TestID,grade,StudentID)
-        Values
-	        (:TestID,:Result,:StudentID);
-"""),{"TestID":g.TestID, "Result":Score,"StudentID":g.User["ID"]})
+        Update grade
+	    SET grade = :Result
+        Where StudentID = :StudentID
+            """),{"Result":Score,"StudentID":g.User["ID"]})
+        
+        
         conn.commit()
+        
         testComplete = True # Marks Test as complete
         
         return render_template("TakeTest.html", error = None, success="Submission Successful", Test = TestInfo, Result = Score, TestComplete = testComplete)
-    except:
-        return render_template("TakeTest.html", error = "Failed", success=None, TestComplete=None)
+    except Exception as e:
+        print(f"Insertion Error: {e}")
+        return render_template("TakeTest.html", error = "Failed", success=None, TestComplete=None, Test = TestInfo)
 
 #--------MAKE TEST PAGE----------
 @app.route("/MakeTest", methods = ['GET'] )
