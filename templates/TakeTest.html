@@ -13,6 +13,10 @@
         justify-items: center;
         justify-self:center;
     }
+    .Test .input_submit{
+        text-align: center;
+        
+    }
     .info{
         text-align: center;
         
@@ -29,8 +33,9 @@
         <h2>Test Complete</h2>
         <h2>{{Result}}%</h2>
     </div>
-    <button id="TakeA" class="Test input_submit" onclick="window.location.href = '/ViewOthersScore'">View other scores for this test</button>
-    
+    {% if g.Student %}
+        <a id="TakeA" class="Test input_submit" href="{{ url_for('reviewTests', TestID=TestID) }}">Review All Tests</a>
+    {% endif %}
 </div>
 {% else %}
 <div class = "Test Account-Container">
@@ -41,8 +46,6 @@
     {% else %}
     <h2>Test Name: {{Test[0][0].title()}}</h2>
     {% for info in Test %}
-    
-
     <p><Strong>{{info[4]}}</Strong> : {{info[3]}}</p>
     <input class="input_field" type="text" name = "Answer{{info[4]}}" placeholder="Answer Question for {{info[4]}}">
     {% endfor %}
