@@ -475,8 +475,48 @@ def EditTest():
         return render_template("EditTest.html", worked=None, nowork="You're not authorized. This is not your test. Make a new one.", Test=[])
 # -----------------View TestResponses--------
 @app.route("/ViewOthersScore", methods=['GET'])
-def viewTests():
-    return render_template("ViewOthersScore.html")
+def reviewTests():
+    TestID = request.args.get("TestID")
+    g.User = session["User"]
+    print(f" VIEW OTHERS{TestID}")
+    try:
+        Review = conn.execute(text("""
+            SELECT g.TestID,q.QuestionsID,q.question,q.answer,g.grade,g.StudentAnswer,g.StudentID,e.TestName,s.first_name
+                FROM Questions AS q
+                JOIN Exam AS e  on e.TestID = q.TestID
+                JOIN Grade AS g on g.TestID = e.TestID and g.questionsID = q.QuestionsID
+                JOIN student AS s on g.StudentID = s.sid
+                Where g.TestID = :TestID
+                Order by q.QuestionsID asc;"""),{"TestID":TestID}).fetchall()
+        
+        print(f"View OTHERS{Review}")
+        groupedReviews= {}
+        for row in Review:
+            print(f"ROW : {row}")
+            StudentID = row[6]
+            if StudentID not in groupedReviews:
+                groupedReviews[StudentID] = {
+                    "TestName":row[7],
+                    "StudentID": StudentID,
+                    "StudentName": row[8],
+                    "Grade":row[4],
+                    "Questions":[]
+                }
+                print(StudentID)
+            groupedReviews[StudentID]["Questions"].append({
+                "QuestionsID": row[1],
+                "Question":row[2],
+                "Answer":row[3],
+                "StudentAnswer":row[5]
+                
+            })
+        groupedReviewsList = list(groupedReviews.values())
+        print(f"Group Reviews: {groupedReviewsList}")
+            
+        return render_template("ViewOthersScore.html",Test=groupedReviewsList)
+    except Exception as e:
+        print(e)
+        return render_template("ViewOthersScore.html",Test=[])
 
 
 if __name__ == '__main__':
