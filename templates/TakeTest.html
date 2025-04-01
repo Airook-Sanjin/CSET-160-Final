@@ -23,9 +23,10 @@
     }
     
 </style>
+<link rel="stylesheet" href="../static/style/ViewPages.css">
 <title>{% block title %} Taking {{Test[0][0].title()}} {% endblock %}</title>
 {% extends 'Base.html' %}
-{% block link %}<link rel="stylesheet" href="../static/style/ViewPages.css">{% endblock link %}
+
 {% block body %}
 {% if TestComplete %}
 <div class="Test Container">

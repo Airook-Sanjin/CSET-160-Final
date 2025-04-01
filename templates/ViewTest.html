@@ -1,6 +1,7 @@
 <style>
     .Test.Card{
-        height: 11rem; ;
+        height: 100%; 
+        max-height: 13rem;
     }
     .Test.Container{
         max-width: 50.5vw;
@@ -18,13 +19,13 @@
     }
 </style>
 <title>{% block title %} Tests {% endblock %}</title>
-
+<link rel="stylesheet" href="../static/style/ViewPages.css">
 {% extends 'Base.html' %}
-{% block link %}<link rel="stylesheet" href="../static/style/ViewPages.css">{% endblock link %}
+
 {% block body %}
 <div class="Body-Container">
 <div class ="Test Container">
-    <h3>AllTests</h3>
+    <h3>All Tests</h3>
         <section class = "Test Card-Container">
             
         {% for Test in AllTests %}

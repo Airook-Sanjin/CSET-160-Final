@@ -1,6 +1,6 @@
 :root{
     --FONT: hsl(95, 11%, 22%);
-    --Primary: hsl(45, 20%, 88%);
+    --Primary: hsl(42, 21%, 88%);
     --Secondary:hsl(23, 12%, 71%);
     --Tertiary:hsl(34, 26%, 30%);
   }
@@ -74,7 +74,9 @@
   }
   
   
-  
+  h3{
+    font-size: x-large;
+  }
   
   *,
   *:before,
@@ -287,7 +289,7 @@
     width:14rem;
     min-height:7rem;
     height: 8rem;
-    max-height: 19rem;
+    max-height: 13rem;
     border-radius: 10px;
     background-color: var(--Primary);
     padding:1rem;
