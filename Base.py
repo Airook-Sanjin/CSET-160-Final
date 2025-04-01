@@ -245,7 +245,7 @@ def SubmitTest():
         
         testComplete = True # Marks Test as complete
         
-        return render_template("TakeTest.html", error = None, success="Submission Successful", Test = TestInfo, Result = Score, TestComplete = testComplete)
+        return render_template("TakeTest.html", error = None, success="Submission Successful", Test = TestInfo, Result = Score, TestComplete = testComplete, TestID=g.TestID)
     except Exception as e:
         print(f"Insertion Error: {e}")
         return render_template("TakeTest.html", error = "Failed", success=None, TestComplete=None, Test = TestInfo)
@@ -478,7 +478,7 @@ def EditTest():
 def reviewTests():
     TestID = request.args.get("TestID")
     g.User = session["User"]
-    print(f" VIEW OTHERS{TestID}")
+    # print(f" VIEW OTHERS{TestID}")
     try:
         Review = conn.execute(text("""
             SELECT g.TestID,q.QuestionsID,q.question,q.answer,g.grade,g.StudentAnswer,g.StudentID,e.TestName,s.first_name
@@ -489,35 +489,62 @@ def reviewTests():
                 Where g.TestID = :TestID
                 Order by q.QuestionsID asc;"""),{"TestID":TestID}).fetchall()
         
-        print(f"View OTHERS{Review}")
-        groupedReviews= {}
+        # print(f"View OTHERS{Review}")
+        groupedReviews= {}  #made a dictionary to keep values
         for row in Review:
-            print(f"ROW : {row}")
-            StudentID = row[6]
-            if StudentID not in groupedReviews:
+            # print(f"ROW : {row}")
+            StudentID = row[6] # Extract the StudentID from the current row
+            if StudentID not in groupedReviews: # If this StudentID is not already in groupedReviews, initialize their data
                 groupedReviews[StudentID] = {
-                    "TestName":row[7],
-                    "StudentID": StudentID,
-                    "StudentName": row[8],
-                    "Grade":row[4],
-                    "Questions":[]
+                    "TestID": row[0], # Test id
+                    "TestName":row[7],  # Test name
+                    "StudentID": StudentID, # Student ID
+                    "StudentName": row[8],  # Student's first name
+                    "Grade":row[4], # Grade for the test
+                    "Questions":[]  # List to store question details
                 }
-                print(StudentID)
-            groupedReviews[StudentID]["Questions"].append({
-                "QuestionsID": row[1],
-                "Question":row[2],
-                "Answer":row[3],
-                "StudentAnswer":row[5]
+                # print(StudentID)
+            groupedReviews[StudentID]["Questions"].append({ # Append the current question details to the student's Questions list
+                "QuestionsID": row[1],  # Question ID
+                "Question":row[2],  # Question text
+                "Answer":row[3], # Correct answer
+                "StudentAnswer":row[5]  # Student's answer
                 
             })
-        groupedReviewsList = list(groupedReviews.values())
-        print(f"Group Reviews: {groupedReviewsList}")
+        groupedReviewsList = list(groupedReviews.values()) # adding it to the list
+        # print(f"Group Reviews: {groupedReviewsList}") # debugging print
             
         return render_template("ViewOthersScore.html",Test=groupedReviewsList)
     except Exception as e:
         print(e)
         return render_template("ViewOthersScore.html",Test=[])
 
+# -----------------change grade--------
+@app.route("/ChangeGrade", methods=['GET'])
+def getgrade():
+    return render_template("ViewOthersScore.html")
+
+@app.route("/ChangeGrade", methods=['POST'])
+def changeGrade():
+    editedgrade = request.form.get("EditGrade")
+    student_id = request.form.get("StudentID")
+    test_id = request.form.get("TestID")  # Retrieve TestID from the form
+    print(f"Edited Grade: {editedgrade}, Student ID: {student_id}, Test ID: {test_id}")  # Debugging print
+    try:
+        # Update the grade in the database
+        conn.execute(text("""
+            UPDATE grade
+            SET grade = :Result
+            WHERE StudentID = :StudentID
+        """), {"Result": editedgrade, "StudentID": student_id})
+        
+        conn.commit()  # Commit the changes to the database
+        
+        print(f"TestID from form: {test_id}")  # Debugging print
+        return redirect(url_for('reviewTests', TestID=test_id))  # Redirect to the review page with the TestID
+    except Exception as e:
+        print(f"Error updating grade: {e}")
+        return render_template("ViewOthersScore.html", error="Failed to update grade.", success=None)
 
 if __name__ == '__main__':
         app.run(debug=True)

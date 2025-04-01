@@ -7,13 +7,19 @@
 
     }
     .Review.Card{
-        width:90%;
-        height:100%;
-        max-height: 50rem;
+        width: 90%;
+        height: auto; 
+        max-height: 50rem; 
+        margin: auto;
+        margin-bottom: 3%;
+        padding: 1rem; 
+        box-sizing: border-box;
     }
     .Review.Card-Container{
         max-height:100vw;
+        max-height: 80vh;
         grid-template-columns: repeat(2, 1fr);
+        overflow-y: scroll;
     }
     .Review.form{
         height:10%;
@@ -28,10 +34,7 @@
 <div class ="Body-Container">
 <div class = "Review Container">
     <div class = "Review Card-Container">
-        
-        
-
-        
+    
         {% for student in Test %}
         <div class="Review Card">
         <h2>Name: {{student.StudentName.title() }}</h2>
@@ -39,11 +42,14 @@
         <h4>Grade: {{student.Grade}}%</h4>
         {% if g.Student %}
             {% else %}
-                <form class = "Review form">
-                    <input type="text" name="EditGrade" id="GradeEDit">
-                    <input type="submit" name="SubmitGrade" id="SubmitGrade" value="Submit Grade">
-                </form>
-        {% endif %}
+            <form class="Review form" action="/ChangeGrade" method="POST">
+                <input type="hidden" name="StudentID" value="{{ student.StudentID }}">
+                <input type="hidden" name="TestID" value="{{ student.TestID }}"> <!-- Pass TestID -->
+                <label for="GradeEdit">Edit Grade:</label>
+                <input class="input_field" type="text" name="EditGrade" id="GradeEdit" placeholder="Enter new grade">
+                <input class="Test input_submit" type="submit" name="SubmitGrade" id="SubmitGrade" value="Submit Grade">
+            </form>            
+            {% endif %}
         
         <table border="1">
             <Tr>
