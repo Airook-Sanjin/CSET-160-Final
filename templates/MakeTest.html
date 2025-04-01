@@ -1,0 +1,57 @@
+<style>
+    .Test.Card{
+        height:13rem;
+        width:18rem;
+    }
+    .Test.Container{
+        max-width: 50.5vw;
+        width:100%;
+    }
+    .Test.Card-Container{
+        grid-template-columns: repeat(2,1fr);
+        max-height:70vh;
+    }
+    .Test.input_submit{
+        display:flex;
+
+        width:60%;
+        align-self: center;
+    }
+    
+</style>
+<title>{% block title %} Make Test {% endblock %}</title>
+<link rel="stylesheet" href="../static/style/ViewPages.css">
+{% extends '/Base.html'%}
+
+{% block body%}
+<div class="Account-Container">
+    
+    <form class= "Form" action="/MakeTest" method="POST">
+        {% if success == None%}
+        <h2>{{error}}</h2>
+        {% elif error == None %}
+            <h2>{{success}}</h2>
+        {% endif %}
+        <input type="text" name="Testname" placeholder="Test Name" class="input_field" required> <br>
+        <input type="number" name="testid" placeholder="Test ID" class="input_field" required> <br>
+        <!-- <input type="number" name="teacherid" placeholder="Teacher ID" class="input_field" required> <br> -->
+        <input type="text" name="quest" placeholder="Question" class="input_field" required> <br>
+        <input type="text" name="ans" placeholder="Answer" class="input_field" required> <br>
+        <input type="submit" value="Add" class="input_submit">
+    </form>
+    <div class="Test Container">
+    <div class="Test Card-Container">
+        {% for quest in questions %}
+            <ul class="Test Card">
+                <p>TEST ID: <strong>{{quest[1]}}</strong></p>
+                    <p>Test Name: <strong>{{quest[0]}}</strong></p>
+                    <p>QID: <strong>{{quest[4]}}</strong></p>
+                    <p>QUESTION: <strong>{{quest[3]}}</strong></p>
+                    <p>ANSWER: <strong>{{quest[2]}}</strong></p>
+                    <p>TEACHER ID: <strong>{{quest[5]}}</strong></p>
+            </ul>
+        {% endfor %}
+    </div>
+</div>
+</div>
+{% endblock %}

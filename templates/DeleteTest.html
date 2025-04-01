@@ -1,0 +1,62 @@
+<style>
+    
+    .Test.Card{
+        height:10rem;
+        width:19rem;
+    }
+   .Delete-.Container{
+    max-width: 100vw;
+    width: 50%;
+   }
+</style>
+<title>{% block title %} Delete Test {% endblock %}</title>
+{% extends '/Base.html'%}
+{% block link %}<link rel="stylesheet" href="../static/style/ViewPages.css">{% endblock link %}
+{% block body%}
+
+    <div class="Account-Container">
+        <form class="Search- Form" action="/SearchTest" method="POST">
+            {% if success == None%}
+            <h2 style="color: red;">{{error}}</h2>
+            {% elif error == None %}
+                <h2 style="color: green;">{{success}}</h2>
+            {% endif %}
+            <input type="hidden" name="page" value="DeleteTest">
+            <input type="number" name="testid" placeholder="Test ID" class="input_field" required> <br>
+            <input type="submit" value="Search" class="input_submit">
+        </form>
+
+        <form class="Delete- Form" action="/DeleteTest" method="POST">
+            {% if worked == None %}
+                <h2 style="color: red;">{{ nowork }}</h2>
+            {% elif nowork == None %}
+                <h2 style="color: green;">{{ worked }}</h2>
+            {% endif %}
+            <input type="number" name="testid" placeholder="Test ID" class="input_field" required> <br>
+            <!-- <input type="number" name="teacherid" placeholder="Teacher ID" class="input_field" required> <br> -->
+            <input type="submit" value="Delete" class="input_submit">
+        </form>
+        {% if Test %}
+    <div class="Delete- Container">
+    <div class="Card-Container">
+        
+            {% for t in Test %}
+            <ul class="Test Card">
+                
+                    <p>TEST ID: <strong>{{t[1]}}</strong></p>
+                        <p>QUESTION: <strong>{{t[2]}}</strong></p>
+                        <p>ANSWER: <strong>{{t[3]}}</strong></p>
+                        <p>TEACHER ID: <strong>{{t[4]}}</strong></p>
+                    
+            </ul>
+            {% endfor %}
+        </div>
+    </div>
+        {% else %}
+        <div class="Container">
+            <p>No questions found for this TestID.</p>
+        </div>
+        {% endif %}
+    
+</div>
+{% endblock  %}

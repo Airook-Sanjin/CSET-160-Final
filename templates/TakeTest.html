@@ -1,0 +1,59 @@
+<style>
+    .Form{
+        text-align: left;
+        height:100%;
+    }
+    .Test.Account-Container{
+    justify-content: center;
+    }
+    .Test.Container{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        justify-items: center;
+        justify-self:center;
+    }
+    .Test .input_submit{
+        text-align: center;
+        
+    }
+    .info{
+        text-align: center;
+        
+    }
+    
+</style>
+<link rel="stylesheet" href="../static/style/ViewPages.css">
+<title>{% block title %} Taking {{Test[0][0].title()}} {% endblock %}</title>
+{% extends 'Base.html' %}
+
+{% block body %}
+{% if TestComplete %}
+<div class="Test Container">
+    <div class="info">
+        <h2>Test Complete</h2>
+        <h2>{{Result}}%</h2>
+    </div>
+    {% if g.Student %}
+        <a id="TakeA" class="Test input_submit" href="{{ url_for('reviewTests', TestID=TestID) }}">Review All Tests</a>
+    {% endif %}
+</div>
+{% else %}
+<div class = "Test Account-Container">
+<form class= "Form" action="/TakeTest" method="POST">
+    
+    {%if Error %}
+    <H2>{{Error}}</H2>
+    {% else %}
+    <h2>Test Name: {{Test[0][0].title()}}</h2>
+    {% for info in Test %}
+    <p><Strong>{{info[4]}}</Strong> : {{info[3]}}</p>
+    <input class="input_field" type="text" name = "Answer{{info[4]}}" placeholder="Answer Question for {{info[4]}}">
+    {% endfor %}
+    <input class = "Test input_submit" type="submit"  Value ="Submit Test" >
+    {% endif %}
+</form>
+
+{% endif %}
+</div>
+{% endblock %}
