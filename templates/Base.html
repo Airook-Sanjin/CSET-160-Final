@@ -10,11 +10,13 @@
   <body>
     <header>
       <div class="topBar">
-        <div class="">
-          <iconify-icon class="logo"icon="akar-icons:python-fill" width="24" height="24"></iconify-icon>
+        <div class="Left-side">
+          <div class = "Logo-Container">
+          <iconify-icon class="logo"icon="akar-icons:python-fill"></iconify-icon>
           <p>PYASSESS</p>
+        </div>
           <ul class="barItem">
-            <li><button id="Home" onclick="window.location.href = '/Home'">HOME</button></li>
+            
             {% if g.Student %}
             
             <li><button id="ViewAccounts" onclick="window.location.href = '/Account'">VIEW ACCOUNTS</button></li>
@@ -33,11 +35,11 @@
           </ul>
         </div>
 
-        <div class="formSection barItem">
+        <div class="Right-side">
           
           {% if g.User %}
-          <p>Hello {{g.User["Name"].title()}}</p>
-          <button id="Profile"><iconify-icon class="logo" icon="mdi:account-circle" ></iconify-icon></button>
+          <h4>Hello {{g.User["Name"].title()}}</h4>
+          <iconify-icon class="Profile" icon="mdi:account-circle">   </iconify-icon>
           <button id="ViewAccounts" onclick="window.location.href = '/'">Log Out</button>
           
           {%endif%}

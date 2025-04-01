@@ -4,8 +4,16 @@
   --Secondary:hsl(23, 12%, 71%);
   --Tertiary:hsl(34, 26%, 30%);
 }
+span{
+  color:var(--Tertiary);
+  font-size: xx-large;
+}
 h1 ,h2{
   color: var(--FONT);
+}
+h1{
+  font-size:7rem;
+  margin:0;
 }
 *,
 *:before,
@@ -28,16 +36,38 @@ body {
   min-height: 100vh;
   justify-items: center;
 }
+.Welcome-Container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width:65vw;
+  height:100vh;
+  background-color: hsl(45, 20%, 82%);
+  text-align: center;
+  justify-content: center;
+}
+.Form-Container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width:35vw;
+  height: 100vh;
+}
 .Login-Container{
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-
+    width: 100vw;
+    height: 100vh;
+    gap: 3rem;
+    justify-content: center;
+    
 }
+
 
 .SignUpLogIn{
     display:flex;
-    width:20vw ;
+    width:50% ;
     flex-direction: column;
     align-items: center;
     gap:1rem;

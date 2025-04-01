@@ -6,6 +6,10 @@
         max-height:100vw;
 
     }
+    .No.Card{
+        width:100%;
+        align-items: center;
+    }
     .Review.Card{
         width: 90%;
         height: auto; 
@@ -26,22 +30,44 @@
         min-height: 10vh;
 
     }
+    table{
+        border-color: var(--Tertiary);
+        background-color: hsl(42, 21%, 84%);
+        box-shadow: 0px 4px 4px hsla(0, 0%, 0%, 0.188),
+        0px 12px 12px hsla(0, 0%, 0%, 0.082);
+        gap:2rem;
+        border-radius: 10px;
+    }
+    th,tr{
+        border: none;
+    }
+    td{
+        text-align: center;
+        border: none;
+        border: 1px solid var(--Tertiary);
+        gap:2rem;
+    }
 
 </style>
+<link rel="stylesheet" href="../static/style/ViewPages.css">
 {% extends 'Base.html' %}
-{% block link %}<link rel="stylesheet" href="../static/style/ViewPages.css">{% endblock link %}
+
 {%block body %}
 <div class ="Body-Container">
 <div class = "Review Container">
     <div class = "Review Card-Container">
-    
+   {% if Test == [] %}
+   <div class="No Card">
+   <h2>No Students have taken the test</h2>
+</div>
+   {% else %}
         {% for student in Test %}
-        <div class="Review Card">
-        <h2>Name: {{student.StudentName.title() }}</h2>
-        <h3>Test Name : {{student.TestName }}</h3>
-        <h4>Grade: {{student.Grade}}%</h4>
+            <div class="Review Card">
+            <h2>Name: {{student.StudentName.title() }}</h2>
+            <h3>{{student.TestName }}</h3>
+            <h4>Grade: {{student.Grade}}%</h4>
         {% if g.Student %}
-            {% else %}
+        {% else %}
             <form class="Review form" action="/ChangeGrade" method="POST">
                 <input type="hidden" name="StudentID" value="{{ student.StudentID }}">
                 <input type="hidden" name="TestID" value="{{ student.TestID }}"> <!-- Pass TestID -->
@@ -49,11 +75,11 @@
                 <input class="input_field" type="text" name="EditGrade" id="GradeEdit" placeholder="Enter new grade">
                 <input class="Test input_submit" type="submit" name="SubmitGrade" id="SubmitGrade" value="Submit Grade">
             </form>            
-            {% endif %}
+        {% endif %}
         
         <table border="1">
             <Tr>
-                <th>Question ID</th>
+                <th>Question #</th>
                 <th>Question</th>
                 <th>Correct Answer</th>
                 <th>Student Answer</th>
@@ -67,7 +93,7 @@
                         <td>{{question.QuestionsID}}</td>
                         <td>{{question.Question}}</td>
                         <td>{{question.Answer}}</td>
-                        <td>{{question.StudentAnswer}}</td>
+                        <td>{{question.StudentAnswer.title()}}</td>
                         
                     </tr>
                     
@@ -78,7 +104,7 @@
         </table>
     </div>
         {% endfor %}
-        
+    {% endif %}
     </div>
     </div>
     </div>
