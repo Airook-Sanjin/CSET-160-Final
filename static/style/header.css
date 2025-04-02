@@ -46,6 +46,7 @@ header li {
 }
 
 .topBar {
+  width: 100%;
   background-color: var(--Secondary);
   display: flex;
   justify-content: space-between;
@@ -103,7 +104,9 @@ header button:active{
   background-color: hsl(0, 0%, 80%);
 }
 
-
+header{
+  width: 100%;
+}
 
 
 *,
