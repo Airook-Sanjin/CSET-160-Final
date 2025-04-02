@@ -1,6 +1,69 @@
 <title>{% block title %} Home {% endblock %}</title>
+<link rel="stylesheet" href="../static/style/Login.css">
+<style>
+    span{
+  color:var(--Tertiary);
+  font-size:unset;
+}
+    .Welcome-Container{
+        width:100vw;
+        height:20vh;
+        background-color: transparent;
+        font-size: larger;
+        justify-content: flex-end;
+    }
 
+    body {
+  justify-items: normal;
+}
+.UserSpan{
+    font-size: small;
+    color:hsla(95, 11%, 32%,50%) ;
+}
+.Features{    
+    width:100vw;
+    height: 50vh;
+}
+.Features-List{
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    align-items: center;
+    /* gap: 2rem; */
+    justify-content: space-evenly;
+    }
+    .Students,.Teachers{
+        text-align: center;
+    }
+</style>
 {% extends 'Base.html' %}
 
 {% block body %}
+<div class = "Welcome-Container">
+    <h2>Hello {{g.User["Name"].title()}}</h2>
+
+</div>
+<div class = "Features">
+    <div class = "Features-List">
+        {% if g.Student %}
+        <section class="Students">
+            <h2>For Students <span class="UserSpan">- That's you</span></h2>
+            <p>You can take tests and review your grade!</p>
+        </section>
+        <section class ="Teachers">
+            <h2>For Teachers</h2>
+            <p>They can create, edit, and grade tests!</p>
+        </section>
+        {% else %}
+        <section class="Students">
+            <h2>For Students</h2>
+            <p>They can take tests and review their grade!</p>
+        </section>
+        <section class ="Teachers">
+            <h2>For Teachers <span class="UserSpan">- That's you</span></h2>
+            <p>You can create, edit, and grade tests!</p>
+        </section>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

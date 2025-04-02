@@ -38,7 +38,7 @@
         <div class="Right-side">
           
           {% if g.User %}
-          <h4>Hello {{g.User["Name"].title()}}</h4>
+          <h4>{{g.User["Name"].title()}}</h4>
           <iconify-icon class="Profile" icon="mdi:account-circle">   </iconify-icon>
           <button id="ViewAccounts" onclick="window.location.href = '/'">Log Out</button>
           
