@@ -52,7 +52,7 @@ def LogIn():
         g.User = User # Makes UserName availabe on current request for template
         print(g.User["Name"])
         
-        return render_template("Accounts.html")
+        return render_template("Home.html")
     except Exception as e:
         print(f"Error: {e}") 
         return render_template("Login.html", error = "User or password is not correct", success = None)

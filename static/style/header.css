@@ -46,6 +46,7 @@ header li {
 }
 
 .topBar {
+  width: 100%;
   background-color: var(--Secondary);
   display: flex;
   justify-content: space-between;
@@ -103,7 +104,9 @@ header button:active{
   background-color: hsl(0, 0%, 80%);
 }
 
-
+header{
+  width: 100%;
+}
 
 
 *,
@@ -118,14 +121,8 @@ html {
 
 body {
   font-family: acumin-pro, system-ui, sans-serif;
-/* darlin  */
   margin: auto;
   display: grid; 
-  
-/* erick */
-/*   margin: 0; */
-/*   display: grid; */
-
   grid-template-rows: auto 1fr auto;
   font-size: 14px;
   background-color:var(--Primary);
@@ -133,14 +130,7 @@ body {
   min-height: 100vh;
 }
 /* -------------------------- Cards ------------------------------------------- */
-.Body-Container{
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  height:30rem;
-  max-width:100vh;
 
-}
 
 
 /* -------------------------- footer ------------------------------------------- */
